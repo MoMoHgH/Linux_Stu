@@ -39,13 +39,13 @@
 10、使用一条命令创建/testdir/dir8/x, /testdir/dir8/y, /testdir/dir8/x/a, 
 /testdir/dir8/x/b, /testdir/dir8/x/c, /testdir/dir8/y/a, /testdir/dir8/y/b
 
-           mdkir -p /testdir/dir8/x/{a,b,c} /testdir/dir8/y/{a,b}
+           mdkir -p /testdir/dir8/{x/{a,b,c},y/{a,b}}
 
-11、使用一条命令创建 /testdir/dir9/x, /testdir/dir10/y, /testdir/dir9/x/a, 
+11、使用一条命令创建 /testdir/dir9/x, /testdir/dir10/y,  /testdir/dir9/x/a,
 /testdir/dir10/y/b
 
-           mkdir -p /testdir/dir9/x/a /testdir/dir10/y/b
+           mkdir -p /testdir/{dir9/x/a,dir10/y/b}
 
 12、使用一条命令创建/testdir/dir11, /testdir/dir12, /testdir/dir13, 
 /testdir/dir12/dir14, /testdir/dir13/dir15
-           mkdir -p /testdir/dir11 /testdir/dir12/dir14 /testdir/dir13/dir15
+           mkdir -p /testdir/{dir11,dir12/dir14,dir13/dir15}
