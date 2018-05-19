@@ -17,21 +17,24 @@
 
 5、显示/etc目录下，所有以一个大写字母开头，以两个数字结尾的文件或目录
 
-          ls -d /etc/[[:upper:]]*[0-9][0-9] 
+           ls -d /etc/[[:upper:]]*[0-9][0-9] 
 
 6、显示/etc目录下，文件名至少包含一个小写字母和一个数字并以.conf结尾的文件或目录
 
-
+           ls -d /etc/*[[:lower:]]*[0-9]*.conf
 
 7、只显示用户家目录下的非隐藏目录
 
-
+           ls ~/
 
 8、定义别名命令baketc，将/etc/目录下所有文件，备份到/testdir独立的子目录下，并要求
 子目录格式为 backupYYYY-mm-dd，备份过程可见
 
+           alias bakup='cp -rv /etc /testdir/backup_`date +%Y%M%D`'
+
 9、创建/testdir/rootdir目录，并复制/root下所有文件到该目录内，要求保留原有权限
 
+           alias 
 
 10、使用一条命令创建/testdir/dir8/x, /testdir/dir8/y, /testdir/dir8/x/a, 
 /testdir/dir8/x/b, /testdir/dir8/x/c, /testdir/dir8/y/a, /testdir/dir8/y/b
