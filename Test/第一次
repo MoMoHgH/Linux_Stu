@@ -1,0 +1,12 @@
+	1.显示前天是星期几
+  
+        date -d '-2 day' +%w
+  
+	2.用tty登录时，另外显示终端名，主机名和时间
+       
+        vim /etc/issue
+        
+        1 CentOS release 6.9 (Final)
+        2 Kernel \r on an \m
+        3 
+        
