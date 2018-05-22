@@ -1,1 +1,6 @@
-
+#主要有四个配置文件：
+        /etc/passwd   
+        /etc/group 
+        /etc/shadow 
+        /etc/gshadow
+       
