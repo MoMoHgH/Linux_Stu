@@ -43,7 +43,7 @@ Hello, I am 用户名,The system version is here,please help me to check it than
 
 10、将文件中每个单词（由字母组成）显示在独立的一行，并无空行
 
-           cat bb.txt | tr -c [[:alpha:]\] '\n'
+           cat bb.txt | tr -c [[:alpha:]] '\n'
 
 11、创建用户gentoo，附加组为bin和root，默认shell为/bin/csh，注释信
 息为"Gentoo Distribution"
