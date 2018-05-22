@@ -1,0 +1,71 @@
+主要有四个配置文件：
+        /etc/passwd   
+        /etc/group 
+        /etc/shadow 
+        /etc/gshadow
+    
+    
+    passwd配置文件信息：
+    cat /etc/passwd
+        共七列：   root:x:0:0:root:/root:/bin/bash
+        分别为：   用户名：密码：用户ID：组ID：描述信息：家目录：用户默认shell
+    man 5 passwd :
+
+              1. account   the name of the user on the system.  It should not contain capital letters.
+
+              2. password  the encrypted user password, an asterisk (*), or the letter 'x'.  (See pwconv(8) for an  explanation
+                        of 'x'.)
+
+              3. UID       the numerical user ID.
+
+              4. GID       the numerical primary group ID for this user.
+
+              5. GECOS     This  field  is  optional  and  only used for informational purposes.  Usually, it contains the full
+                        username.  GECOS means General Electric Comprehensive Operating System, which has  been  renamed  to
+                        GCOS  when  GE’s  large systems division was sold to Honeywell.  Dennis Ritchie has reported: "Some-
+                        times we sent printer output or batch jobs to the GCOS machine.  The gcos field in the password file
+                        was a place to stash the information for the $IDENTcard.  Not elegant."
+
+              6. directory the user’s $HOME directory.
+
+              7. shell     the  program to run at login (if empty, use /bin/sh).  If set to a non-existing executable, the user
+                        will be unable to login through login(1).
+                        
+     group配置文件信息：                
+     cat /etc/group
+         共四列:     root:x:0:gentoo
+         分别为:     组名：密码：组ID：用户列表
+     man 5 group : 
+              1. group_name   the name of the group.
+              
+              2. password     the (encrypted) group password.  If this field is empty, no password is needed.         
+              
+              3. GID          the numerical group ID.
+
+              4. user_list    a list of the usernames that are members of this group, separated by commas.
+          
+      shadow配置文件信息：
+      cat /etc/shadow
+          共九列：   root:$6$TVvqRphKPRbBmGIp$WHiMP8Lz9Xz2uCPxk.tjCWL1aZuHBzM25lr0F/YztvPMUkMHoIsTvQMpkBsNbOPfQBTyLgKcjDgUFaQCtgV/q0:17667:0:99999:7:::
+                    hgh:!!:17672:0:99999:7:::
+          分别为：   用户名：用户密码(加密过)：最近一次更改的时间：密码使用最少天数：密码使用最大天数：密码过期前几天提醒用户：密码过期几天后帐号会被锁定：帐户过期时间（从1970-1-1开始计算）：保留位          
+          
+     man 5 shadow : 
+              
+              1. login name
+          
+              2. encrypted password
+          
+              3. date of last password change
+          
+              4. minimum password age
+         
+              5. maximum password age
+       
+              6. password warning period
+     
+              7. password inactivity period
+           
+              8. account expiration dat
+
+              9. reserved field
