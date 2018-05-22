@@ -1,0 +1,41 @@
+`Linux用户和组的主要配置文件：`
+      /etc/passwd：用户及其属性信息(名称、UID、主组ID等）
+      /etc/group：组及其属性信息
+      /etc/shadow：用户密码及其相关属性
+      /etc/gshadow：组密码及其相关属性
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/etc/passwd
+	name:用户名
+	password:密码位，pwconv 密码被映射到了/etc/shadow
+	uid: 
+	gid:
+	gecos:描述位
+	home: 家目录
+	shell: 默认为/bin/bash 如果设置为/sbin/nologin 表示不可以交互式登录
+
+/etc/shadow
+	name:用户名
+	password:$6$salt$password
+	密码上一次的修改时间：
+	密码的最小存活期：在这个时间到达之前，不能改密码
+	密码的最大存活期：密码的过期时间
+	密码过期前多少天警告：
+	密码过期后多少天触发帐户过期：
+	帐户过期时间：从1970-1-1开始计算
+	保留位
