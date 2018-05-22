@@ -43,7 +43,7 @@ Hello, I am 用户名,The system version is here,please help me to check it than
 
 10、将文件中每个单词（由字母组成）显示在独立的一行，并无空行
 
-           cat bb.txt | tr -c [[:alpha:]] '\n'
+           cat bb.txt | tr -c [[:alpha:]] '\n' | tr -s '\n'
 
 11、创建用户gentoo，附加组为bin和root，默认shell为/bin/csh，注释信
 息为"Gentoo Distribution"
@@ -61,4 +61,4 @@ sarah密码都是centos
            useradd -p '$6$TVvqRphKPRbBmGIp$WHiMP8Lz9Xz2uCPxk.tjCWL1aZuHBzM25lr0F/YztvPMUkMHoIsTvQMpkBsNbOPfQBTyLgKcjDgUFaQCtgV/q0' -G admins natasha
            useradd -p '$6$TVvqRphKPRbBmGIp$WHiMP8Lz9Xz2uCPxk.tjCWL1aZuHBzM25lr0F/YztvPMUkMHoIsTvQMpkBsNbOPfQBTyLgKcjDgUFaQCtgV/q0' -G admins harry
            useradd -p '$6$TVvqRphKPRbBmGIp$WHiMP8Lz9Xz2uCPxk.tjCWL1aZuHBzM25lr0F/YztvPMUkMHoIsTvQMpkBsNbOPfQBTyLgKcjDgUFaQCtgV/q0' -s /sbin/nologin sarah
-           
+           注：useradd -p 
