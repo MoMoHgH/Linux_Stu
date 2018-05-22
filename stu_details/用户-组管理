@@ -5,7 +5,8 @@
         /etc/gshadow
     
     
-    passwd配置文件信息：
+一： passwd配置文件信息：
+
     cat /etc/passwd
         共七列：   root:x:0:0:root:/root:/bin/bash
         分别为：   用户名：密码：用户ID：组ID：描述信息：家目录：用户默认shell
@@ -31,11 +32,11 @@
               7. shell     the  program to run at login (if empty, use /bin/sh).  If set to a non-existing executable, the user
                         will be unable to login through login(1).
                         
-     group配置文件信息：                
-     cat /etc/group
-         共四列:     root:x:0:gentoo
-         分别为:     组名：密码：组ID：用户列表
-     man 5 group : 
+二：  group配置文件信息：                
+      cat /etc/group
+          共四列:     root:x:0:gentoo
+          分别为:     组名：密码：组ID：用户列表
+      man 5 group : 
               1. group_name   the name of the group.
               
               2. password     the (encrypted) group password.  If this field is empty, no password is needed.         
@@ -44,7 +45,7 @@
 
               4. user_list    a list of the usernames that are members of this group, separated by commas.
           
-      shadow配置文件信息：
+三：  shadow配置文件信息：
       cat /etc/shadow
           共九列：   root:$6$TVvqRphKPRbBmGIp$WHiMP8Lz9Xz2uCPxk.tjCWL1aZuHBzM25lr0F/YztvPMUkMHoIsTvQMpkBsNbOPfQBTyLgKcjDgUFaQCtgV/q0:17667:0:99999:7:::
                     hgh:!!:17672:0:99999:7:::
@@ -69,3 +70,20 @@
               8. account expiration dat
 
               9. reserved field
+  
+四：   gshadow配置文件信息：
+       cat /etc/gshadow :
+              共四列:     root:::gentoo 
+              分别为:     组名称：组密码：组管理员：组成员（作为附加组的成员）
+       man 5 group :
+              1. group name
+              
+              2. encrypted password
+              
+              3. administrators
+              
+              4. members
+
+               
+ 
+              
