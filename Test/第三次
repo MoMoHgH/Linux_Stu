@@ -48,7 +48,7 @@ Hello, I am 用户名,The system version is here,please help me to check it than
 11、创建用户gentoo，附加组为bin和root，默认shell为/bin/csh，注释信
 息为"Gentoo Distribution"
 
-
+           useradd -s /bin.csh -c 'Gentoo Distribution' -G bin,root gentoo
 
 12、创建下面的用户、组和组成员关系
 名字为admins 的组
@@ -57,5 +57,8 @@ Hello, I am 用户名,The system version is here,please help me to check it than
 用户sarah，不可交互登录系统，且不是admins 的成员，natasha，harry，
 sarah密码都是centos
 
-
-
+           groupadd admins
+           useradd -p '$6$TVvqRphKPRbBmGIp$WHiMP8Lz9Xz2uCPxk.tjCWL1aZuHBzM25lr0F/YztvPMUkMHoIsTvQMpkBsNbOPfQBTyLgKcjDgUFaQCtgV/q0' -G admins natasha
+           useradd -p '$6$TVvqRphKPRbBmGIp$WHiMP8Lz9Xz2uCPxk.tjCWL1aZuHBzM25lr0F/YztvPMUkMHoIsTvQMpkBsNbOPfQBTyLgKcjDgUFaQCtgV/q0' -G admins harry
+           useradd -p '$6$TVvqRphKPRbBmGIp$WHiMP8Lz9Xz2uCPxk.tjCWL1aZuHBzM25lr0F/YztvPMUkMHoIsTvQMpkBsNbOPfQBTyLgKcjDgUFaQCtgV/q0' -s /sbin/nologin sarah
+           
