@@ -146,7 +146,35 @@
           chown -R magetest.magetest /home/magetest
           chmod -R 700 /home/matgtest
       
-      
+    groupadd 
+	-g GID GNAME
+	-r GNAME
+	
+groupdel GNAME
+
+gpasswd
+	Options:
+  -a, --add USER                增加单个用户到指定组当中（组管理员可执行）
+  -d, --delete USER             从指定组中删除单个用户（组管理员可执行）
+  -r, --delete-password         将指定组的组密码删除（组管理员可执行）
+  -R, --restrict                限制组成员访问该组
+  -M, --members USER,...        一次性设置组成员（仅root执行）
+  -A, --administrators ADMIN,... 设置组管理列表（root执行）
+
+newgrp groupname
+	用户会打开一个子shell，在这个子shell下，该用户的主要组切换为该组，若该用户本不属于该组，则要输入组密码，若该组属于用户的附加组之一，则无需输入密码。
+
+
+
+groupmems
+	-g GNAME
+		-a  USERNAME 加用户加入到指定组
+		-d  USERNAME 把用户从指定组删除
+		-p  清除该组的所有成员
+		-l  列出组成员列表 
+
+groups USERNAME
+	查看用户属于哪些组（包含主要组）
       
       
       
