@@ -121,13 +121,13 @@
 
 
    passwd [OPTIONS] UserName: 修改指定用户的密码，仅root用户权限
-              passwd: 修改自己的密码
-                常用选项：
-                  -l:锁定指定用户
-                  -u:解锁指定用户
-                  -e:强制用户下次登录修改密码
-                  --stdin：从标准输入接收用户密码
-                  echo "PASSWORD" | passwd --stdin USERNAME
+   passwd: 修改自己的密码
+   常用选项：
+        -l:锁定指定用户
+        -u:解锁指定用户
+        -e:强制用户下次登录修改密码
+        --stdin：从标准输入接收用户密码
+        echo "PASSWORD" | passwd --stdin USERNAME
    
    
    chage Options:
