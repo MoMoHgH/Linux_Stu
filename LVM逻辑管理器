@@ -5,6 +5,7 @@ PV阶段
   pvdisplay   显示系统中PV的详细信息。
   pvremove    将PV属性删除，使该磁盘不再具有PV属性
 
+
 VG阶段
   vgcreate    新建卷组
     -s 指定PE的大小，单位可以是mMgGtT,PE默认大小为4M
@@ -15,6 +16,7 @@ VG阶段
   vgreduce    减少卷组中的PV
   vgchange    设置卷组是否启用
   vgremove    删除一个VG
+  
   
 LV阶段
   lvcreate   新建LV
