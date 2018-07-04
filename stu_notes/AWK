@@ -28,24 +28,20 @@
     
     
     
-5. 统计tcp连接的状态
-
+5. 统计连接的状态
+     tcp连接状态统计
   	ss -nta |awk '!/^State/{ state[$1]++}END{for(i in state){print i,state[i]}}'
 	  [root@localhost awk]# ss -nta |awk '!/^State/{ state[$1]++}END{for(i in state){print i,state[i]}}'
 	  ESTAB 1
-  	LISTEN 12
-    
-    
-    
-6. 
-    ss -nt | awk -F'[ :]+'  '!/State/{ip[$(NF-2)]++}END{for( i in ip){print i,ip[i]}}'
-
-    ss -nt | awk -F'[ :]+'  '!/State/{ip[$(NF-2)]++}END{for( i in ip){print i,ip[i]}}' | while read line ;do ip=`echo $line| awk '{if($2>2)print $1}'`;[ -z "$ip" ] || iptables -A INPUT -s $ip -j REJECT; done
-
-    ss -nt | awk -F'[ :]+'  '!/State/{ip[$(NF-2)]++}END{for( i in ip){print i,ip[i]}}' | while read line ;do num=`echo $line |cut -d " " -f2`;ip=`echo $line|cut -d" " -f1`;[ $num -gt 3 ] && iptables -A INPUT -s $ip -j REJECT ; done 
-
-
-    ss -nt | awk -F'[ :]+'  '!/State/{ip[$(NF-2)]++}END{for( i in ip){print i,ip[i]}}'  |sort -nr -k2|head
+	  LISTEN 12
+     统计有哪些IP地址对本机的连接，及次数
+    	ss -nt | awk -F'[ :]+'  '!/State/{ip[$(NF-2)]++}END{for( i in ip){print i,ip[i]}}'
+     
+    	ss -nt | awk -F'[ :]+'  '!/State/{ip[$(NF-2)]++}END{for( i in ip){print i,ip[i]}}' | while read line ;do ip=`echo $line| awk '{if($2>2)print $1}'`;[ -z "$ip" ] || iptables -A INPUT -s $ip -j REJECT; done
+   	
+	ss -nt | awk -F'[ :]+'  '!/State/{ip[$(NF-2)]++}END{for( i in ip){print i,ip[i]}}' | while read line ;do num=`echo $line |cut -d " " -f2`;ip=`echo $line|cut -d" " -f1`;[ $num -gt 3 ] && iptables -A INPUT -s $ip -j REJECT ; done 
+  	
+	ss -nt | awk -F'[ :]+'  '!/State/{ip[$(NF-2)]++}END{for( i in ip){print i,ip[i]}}'  |sort -nr -k2|head
 
     awk '!/name/{if($2=="m"){m++;msum+=$3};if($2=="f"){f++;fsum+=$3}}END{print "mavg="msum/m,"favg="fsum/f}' score.txt
 
