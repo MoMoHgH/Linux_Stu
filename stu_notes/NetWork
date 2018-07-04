@@ -30,4 +30,8 @@ centos6
       ifconfig eth0 up
   
   
+  ifconfig 命令：
+      ifconfig
+  
+  
   
