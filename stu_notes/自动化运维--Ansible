@@ -143,3 +143,46 @@ Group：管理组
         ansible srv -m group -a "name=testgroup state=absent" 
 
 
+
+[root@centos_6_S_002 roles]# tree
+.
+├── httpd
+│   ├── files
+│   │   ├── httpd6.conf
+│   │   ├── httpd7.conf
+│   │   └── index.html
+│   └── tasks
+│       ├── copyfile6.yml
+│       ├── copyfile7.yml
+│       ├── copyfile.yml
+│       ├── group.yml
+│       ├── main.yml
+│       ├── service.yml
+│       ├── user.yml
+│       └── yum.yml
+├── memcached
+│   ├── tasks
+│   │   ├── conf.yml
+│   │   ├── install.yml
+│   │   ├── main.yml
+│   │   └── service.yml
+│   └── templates
+│       └── memcached.j2
+└── nginx
+    ├── files
+    │   └── nginx.conf
+    ├── handlers
+    │   └── main.yml
+    ├── tasks
+    │   ├── copyfile.yml
+    │   ├── group.yml
+    │   ├── html.yml
+    │   ├── main.yml
+    │   ├── service.yml
+    │   ├── user.yml
+    │   └── yum.yml
+    ├── templates
+    │   └── nginx.conf.j3
+    └── vars
+        └── main.yml
+
