@@ -1,6 +1,8 @@
-[root@centos6 ~]#cat hostlist.txt 
-192.168.30.7 root centos
-192.168.30.17 root magedu
+主机IP列表：
+        [root@centos6 ~]#cat hostlist.txt 
+        192.168.30.7 root centos
+        192.168.30.17 root magedu
+
 
 [root@centos6 ~]#cat pushkey.sh 
 #!/bin/bash
