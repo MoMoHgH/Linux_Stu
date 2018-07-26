@@ -1,0 +1,90 @@
+
+1 数据库存放的空间，逻辑卷
+fdisk /dev/sda
+partprobe 
+pvcreate  /dev/sda6
+vgcreate  vg0 /dev/sda6
+lvcreate  -n mysql -l +100%FREE vg0
+lvdisplay 
+mkfs.xfs  /dev/vg0/mysql 
+
+mkdir /data
+mount /dev/vg0/mysql  /app
+vim /etc/fstab 
+
+2 创建mysql
+getent passwd mysql
+useradd -r -s /sbin/nologin -d /app/mysql -m mysql
+
+
+3 二进制程序存放对应路径
+tar xvf mariadb-10.2.16-linux-x86_64.tar.gz  -C /usr/local/
+cd /usr/local/
+ln -s mariadb-10.2.16-linux-x86_64/ mysql
+
+chown -R root.mysql /usr/local/mysql/
+
+4 PATH变量
+vim /etc/profile.d/mysql.sh
+PATH=/usr/local/mysql:$PATH
+
+. /etc/profile.d/mysql.sh
+
+5 创建数据库相关数据文件
+cd /usr/local/mysql/
+scripts/mysql_install_db  --datadir=/app/mysql --user=mysql
+
+6 准备Mysql配置文件
+cp  /usr/local/mysql/support-files/my-huge.cnf /etc/my.cnf
+vim /etc/my.cnf
+datadir=/app/mysql
+
+7 准备启动脚本
+chkconfig --list
+cp /usr/local/mysql/support-files/mysql.server  /etc/init.d/mysqld
+
+chkconfig --add mysqld
+ll /etc/init.d/mysqld
+chkconfig --list
+service mysqld start
+
+8 安全加固
+mysql_secure_installation 
+
+
+
+
+
+yum install bison bison-devel zlib-devel libcurl-devel libarchive-devel boostdevel
+gcc gcc-c++ cmake ncurses-devel gnutls-devel libxml2-devel openssldevel
+libevent-devel libaio-devel 
+
+mkdir /data
+useradd –r –s /bin/false –m –d /data/mysqldb/ mysql
+tar xvf mariadb-10.2.15.tar.gz
+
+
+cd mariadb-10.2.15/
+cmake . \
+-DCMAKE_INSTALL_PREFIX=/app/mysql \
+-DMYSQL_DATADIR=/data/mysqldb/ \
+-DSYSCONFDIR=/etc \
+-DMYSQL_USER=mysql \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+-DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+-DWITH_PARTITION_STORAGE_ENGINE=1 \
+-DWITHOUT_MROONGA_STORAGE_ENGINE=1 \
+-DWITH_DEBUG=0 \
+-DWITH_READLINE=1 \
+-DWITH_SSL=system \
+-DWITH_ZLIB=system \
+-DWITH_LIBWRAP=0 \
+-DENABLED_LOCAL_INFILE=1 \
+-DMYSQL_UNIX_ADDR=/app/mysql/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci
+make && make install 
+
+
+
