@@ -13,3 +13,15 @@ Mysql安装
       https://mirrors.tuna.tsinghua.edu.cn/mariadb/yum/10.2/centos7-amd64    MariaDB镜像
       
       
+二进制安装（MariaDB）
+      1.准备Mysql数据目录
+            因为数据库
+      
+
+
+源码编译安装
+
+
+
+
+yum安装
