@@ -69,7 +69,56 @@ Mysql安装
 
 
 源码编译安装
+      1 依赖关系
+            yum install bison bison-devel zlib-devel libcurl-devel libarchive-devel
+            boostdevel gcc gcc-c++ cmake ncurses-devel gnutls-devel libxml2-devel
+            openssldevel libevent-devel libaio-devel 
+            
+      2 数据目录
+            mkdir /data
+            useradd –r –s /bin/false –m –d /data/mysqldb/ mysql
+            tar xvf mariadb-10.2.15.tar.gz
+       
+      3 cmake
+            cd mariadb-10.2.15/
+            cmake . \
+            -DCMAKE_INSTALL_PREFIX=/app/mysql \       二进制程序所在路径
+            -DMYSQL_DATADIR=/data/mysqldb/ \          数据库存放数据路径
+            -DSYSCONFDIR=/etc \
+            -DMYSQL_USER=mysql \
+            -DWITH_INNOBASE_STORAGE_ENGINE=1 \
+            -DWITH_ARCHIVE_STORAGE_ENGINE=1 \
+            -DWITH_BLACKHOLE_STORAGE_ENGINE=1 \
+            -DWITH_PARTITION_STORAGE_ENGINE=1 \
+            -DWITHOUT_MROONGA_STORAGE_ENGINE=1 \
+            -DWITH_DEBUG=0 \
+            -DWITH_READLINE=1 \
+            -DWITH_SSL=system \
+            -DWITH_ZLIB=system \
+            -DWITH_LIBWRAP=0 \
+            -DENABLED_LOCAL_INFILE=1 \
+            -DMYSQL_UNIX_ADDR=/app/mysql/mysql.sock \
+            -DDEFAULT_CHARSET=utf8 \
+            -DDEFAULT_COLLATION=utf8_general_ci
+            make && make install 
+            
+      4 环境变量
+            echo 'PATH=/app/mysql/bin:$PATH' > /etc/profile.d/mysql.sh
+            . /etc/profile.d/mysql.sh
 
+      5 生成数据库文件
+            cd /app/mysql/
+            scripts/mysql_install_db --datadir=/data/mysqldb/ --user=mysql
+       
+      6 配置文件
+            cp /app/mysql/support-files/my-huge.cnf /etc/my.cnf
+            
+      7 启动脚本
+            cp /app/mysql/support-files/mysql.server /etc/init.d/mysqld  
+            chkconfig --add mysqld
+            ll /etc/init.d/mysqld
+            chkconfig --list
+            service mysqld start
 
 
 
