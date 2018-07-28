@@ -24,62 +24,62 @@
               └── socket
 
      
-    1准备目录
-        mkdir /data/{3306,3307,3308}/{etc,bin,data,pid,socket,log} -pv
-        chown -R mysql.mysql /data/
+ 1准备目录
+      mkdir /data/{3306,3307,3308}/{etc,bin,data,pid,socket,log} -pv
+      chown -R mysql.mysql /data/
 
 
-    2 生成数据库文件
-        cd /usr/local
+ 2 生成数据库文件
+      cd /usr/local
         
-        script/mysql_install_db  --datadir=/data/3306/data --user=mysql
-        script/mysql_install_db  --datadir=/data/3307/data --user=mysql
-        script/mysql_install_db  --datadir=/data/3308/data --user=mysql
+      script/mysql_install_db  --datadir=/data/3306/data --user=mysql
+      script/mysql_install_db  --datadir=/data/3307/data --user=mysql
+      script/mysql_install_db  --datadir=/data/3308/data --user=mysql
 
 
-    3准备配置文件
-        cp /etc/my.cnf /data/3306/etc/    
-        cp /data/3306/etc/my.cnf /data/3307/etc/
-        cp /data/3306/etc/my.cnf /data/3308/etc/
-        sed -i 's/3306/3307/g' /data/3307/etc/my.cnf
-        sed -i 's/3306/3308/g' /data/3308/etc/my.cnf
+ 3 准备配置文件
+      cp /etc/my.cnf /data/3306/etc/    
+      cp /data/3306/etc/my.cnf /data/3307/etc/
+      cp /data/3306/etc/my.cnf /data/3308/etc/
+      sed -i 's/3306/3307/g' /data/3307/etc/my.cnf
+      sed -i 's/3306/3308/g' /data/3308/etc/my.cnf
 
 
-    4生成启动脚本
-     cp mysqld /data/3306/bin/
-     vim /data/3306/bin/mysqld 
-     cmd_path="/usr/local/mysql/bin"
-     chmod +x /data/3306/bin/mysqld
+ 4 生成启动脚本
+      cp mysqld /data/3306/bin/
+      vim /data/3306/bin/mysqld 
+      cmd_path="/usr/local/mysql/bin"
+      chmod +x /data/3306/bin/mysqld
      
-     cp /data/3306/bin/mysqld  /data/3307/bin/
-     cp /data/3306/bin/mysqld  /data/3308/bin/
+      cp /data/3306/bin/mysqld  /data/3307/bin/
+      cp /data/3306/bin/mysqld  /data/3308/bin/
 
 
 
-    5服务启动与关闭
+ 5 服务启动与关闭
     
-     /data/3306/bin/mysqld  start
-     /data/3307/bin/mysqld  start
-     /data/3308/bin/mysqld  start
-     /data/3306/bin/mysqld  stop
-     /data/3307/bin/mysqld  stop
-     /data/3308/bin/mysqld  stop
+      /data/3306/bin/mysqld  start
+      /data/3307/bin/mysqld  start
+      /data/3308/bin/mysqld  start
+      /data/3306/bin/mysqld  stop
+      /data/3307/bin/mysqld  stop
+      /data/3308/bin/mysqld  stop
 
-     mysql -S /data/3306/socket/mysql.sock
-     mysql -S /data/3307/socket/mysql.sock 
-     mysql -S /data/3307/socket/mysql.sock 
+      mysql -S /data/3306/socket/mysql.sock
+      mysql -S /data/3307/socket/mysql.sock 
+      mysql -S /data/3307/socket/mysql.sock 
 
   
-  6 修改root口令
-     mysqladmin  -S /data/3306/socket/mysql.sock password 'centos'
-     mysqladmin  -S /data/3307/socket/mysql.sock password 'centos'
-     mysqladmin  -S /data/3308/socket/mysql.sock password 'centos'
+ 6 修改root口令
+      mysqladmin  -S /data/3306/socket/mysql.sock password 'centos'
+      mysqladmin  -S /data/3307/socket/mysql.sock password 'centos'
+      mysqladmin  -S /data/3308/socket/mysql.sock password 'centos'
 
 
 
- 配置文件内容 （my.cfg）
- 
- # Example MariaDB config file for very large systems.
+配置文件内容 （my.cfg）
+
+# Example MariaDB config file for very large systems.
 #
 # This is for a large system with memory of 1G-2G where the system runs mainly
 # MariaDB.
@@ -239,10 +239,9 @@ interactive-timeout
  
  
  
+启动脚本内容 （mysqld）
  
- 启动脚本内容 （mysqld）
- 
- #!/bin/bash
+#!/bin/bash
 
 port=3306
 mysql_user="root"
