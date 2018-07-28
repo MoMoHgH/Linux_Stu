@@ -30,7 +30,7 @@
 
 
  2 生成数据库文件
-      cd /usr/local
+      cd /usr/local/mysql
         
       script/mysql_install_db  --datadir=/data/3306/data --user=mysql
       script/mysql_install_db  --datadir=/data/3307/data --user=mysql
