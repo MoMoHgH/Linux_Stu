@@ -76,7 +76,7 @@ Mysql安装
             
       2 数据目录
             mkdir /data
-            useradd –r –s /bin/false –m –d /data/mysqldb/ mysql
+            useradd –r –s /sbin/nologin –m –d /data/mysqldb/ mysql
             tar xvf mariadb-10.2.15.tar.gz
        
       3 cmake
