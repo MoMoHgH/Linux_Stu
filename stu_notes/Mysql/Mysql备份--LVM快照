@@ -25,7 +25,7 @@
 
    mysql -e "flush tables with read lock";
    mysql -e 'SHOW MASTER STATUS'> /root/bin.log
-   lvcreate -n mysqldatasnap -s -L 100M -p r  /dev/vg0/mysqldata;     对mysql数据做快照   
+   lvcreate -n mysqldatasnap -s -L 100M -p r  /dev/vg0/mysqldata;     对mysql数据做快照 , -p r对快照添加只读属性 
    mysql -e "unlock tables"
 
 
