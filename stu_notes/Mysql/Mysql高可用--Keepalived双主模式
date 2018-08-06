@@ -1,9 +1,126 @@
 
-|------------|----------------|------------------|---------------|---------------|
-|  hostname  | system version |  Mysql version   |      IP       |   Mysql VIP   |
-|------------|----------------|------------------|---------------|---------------|
-|    DB1     |   CentOS 7.5   |  mariadb-5.5.56  |  192.168.1.5  |               |
-|------------|----------------|------------------|---------------|  192.168.1.5  |
-|    DB2     |   CentOS 7.5   |  mariadb-5.5.56  |  192.168.1.6  |               |
-|------------|----------------|------------------|---------------|---------------|
-                         Mysql主主互备模式配置环境
+
+                    +------------+----------------+-------------------+---------------+---------------+
+                    |  hostname  | system version |   Mysql version   |      IP       |   Mysql VIP   |
+                    |------------|----------------|-------------------|---------------|---------------|
+                    |    DB1     |   CentOS 7.5   |  mariadb-10.2. 16 |  192.168.1.1  |               |
+                    |------------|----------------|-------------------|---------------|  192.168.1.3  |
+                    |    DB2     |   CentOS 7.5   |  mariadb-10.2.16  |  192.168.1.2  |               |
+                    +------------+----------------+-------------------+---------------+---------------+
+                                             Mysql主主互备模式配置环境
+
+                    #   安装方式为二进制安装
+                    #   mysql数据目录：/data/mysql   二进制日志目录：/data/binlogs
+
+
+
+
+
+
+1. 修改Mysql配置文件
+
+        修改DB1主机的配置文件：(在 [mysqld] 后面添加如下内容)
+        
+            [mysqld]
+            log-bin         =     /data/binlogs/mysql-bin               # 二进制文件位置，并且文件名为：mysql-bin.00000X
+            server-id       =     1                                     # 节点标识，确保唯一
+            relay-log       =     mysql-relay-bin                       # 中继日志
+            replicate-wild-ignore-table   =   mysql.%                   # 过滤选项，过滤掉不需要复制的数据库或表
+            replicate-wild-ignore-table   =   information_schema.%
+
+
+
+
+        修改DB2主机的配置文件：(在 [mysqld] 后面添加如下内容)
+        
+            [mysqld]
+            log-bin         =     /data/binlogs/mysql-bin
+            server-id       =     2
+            relay-log       =     mysql-relay-bin
+            replicate-wild-ignore-table   =   mysql.%
+            replicate-wild-ignore-table   =   information_schema.%
+            
+            
+            
+            
+
+
+2. 手动同步数据库
+        
+        在DB1上： （确保 DB1 和 DB2 数据的一致性）
+        
+            MariaDB [hellodb]> FLUSH TABLES WITH READ LOCK;             # 添加读锁，不要退出此终端，以免读锁失效；
+            
+            在新的终端中：
+            cd /data                                                    # 进到Mysql数据目录，打包数据文件
+            tar -czvf /app/mysql-db1-back-`date +%F`.tar.gz mysql
+            scp /app/mysql-db1-back-2018-08-07.tar.gz 192.168.1.2:/app/      # 复制到DB2上面去
+        
+        在DB2上： 
+            
+            cd /data
+            rm -rf /data/mysql/*                                        # 删除 DB2 Mysql的数据文件
+            tar -xzvf /app/mysql-db1-back-2018-08-07.tar.gz             # 解压 DB1 的数据文件，使 DB1 和 DB2 的数据一致
+
+        重启 DB1 和 DB2 的Mysql服务
+            
+            service mysqld restart
+
+
+3. 创建复制用户并授权
+
+        在DB1上：（将 DB1 设为 DB2的主服务器）
+        
+            为DB2创建复制用户：
+            MariaDB [(none)]>grant replication slave on *.* to 'master'@'192.168.1.2' identified by 'centos';
+            
+            查看当前二进制日志记录状态：
+            MariaDB [hellodb]> show master status;
+            +------------------+----------+--------------+------------------+
+            | File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
+            +------------------+----------+--------------+------------------+
+            | mysql-bin.000002 |      744 |              |                  |
+            +------------------+----------+--------------+------------------+
+            
+        在DB2上：
+        
+            将 DB1 设为自己的主服务器：    
+            change master to \
+            master_host='192.168.1.1',
+            master_user='master',
+            master_password='centos',
+            master_log_file='mysql-bin.000002',                     此处为 DB1 的最新二进制日志文件（通过查看 DB1 状态所得）
+            master_log_pos=744;                                     此处为 DB1 的二进制日志记录最新位置（通过查看 DB1 状态所得）
+            
+        --------------------------------------
+        
+        
+        在DB2上：（将 DB2 设为 DB1 的主服务器）
+        
+            为DB1创建复制用户：
+            MariaDB [(none)]>grant replication slave on *.* to 'master'@'192.168.1.1' identified by 'centos';
+            
+            查看当前二进制日志记录状态：
+            MariaDB [hellodb]> show master status;
+            +------------------+----------+--------------+------------------+
+            | File             | Position | Binlog_Do_DB | Binlog_Ignore_DB |
+            +------------------+----------+--------------+------------------+
+            | mysql-bin.000001 |      245 |              |                  |
+            +------------------+----------+--------------+------------------+
+            
+        在DB1上：
+        
+            将 DB2 设为自己的主服务器：    
+            change master to \
+            master_host='192.168.1.2',
+            master_user='master',
+            master_password='centos',
+            master_log_file='mysql-bin.000001',                     此处为 DB2 的最新二进制日志文件（通过查看 DB2 状态所得）
+            master_log_pos=245;                                     此处为 DB2 的二进制日志记录最新位置（通过查看 DB2 状态所得） 
+        
+            
+
+
+
+
+
