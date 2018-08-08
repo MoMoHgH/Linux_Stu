@@ -120,7 +120,192 @@
         
             
 
+4. 配置keepalived
+
+        DB1,DB2 源码安装 keepaliedkeepalived-2.0.6.tar.gz
+        
+            /app/keepalived-2.0.6.tar.gz
+            tar -xzvf keepalived-2.0.6.tar.gz
+            cd keepalived-2.0.6/
+            ./configure --prefix=/usr/local/keepalived
+                  可能存在的依赖性关系
+                        yum install openssl openssl-devel
+                        yum install libnl libnl-devel
+                        yum install libnfnetlink-devel
+            mkdir /usr/local/keepalived
+            ./configure --prefix=/usr/local/keepalived
+            make && make install
+            cp /app/keepalived-2.0.6/keepalived/etc/init.d/keepalived /etc/init.d/
+            cp /usr/local/keepalived/etc/sysconfig/keepalived /etc/sysconfig/
+            chkconfig keepalived on
+            
+            
+            
+         keepalived配置文件 
+         
+         DB1:
+            /etc/keeoalived/keepalived.conf
+            
+            ! Configuration File for keepalived
+
+            global_defs {
+               notification_email {
+                 acassen@firewall.loc
+                 failover@firewall.loc
+                 sysadmin@firewall.loc
+               }
+               notification_email_from Alexandre.Cassen@firewall.loc
+               smtp_server 192.168.200.1
+               smtp_connect_timeout 30
+               router_id LVS_DEVEL
+               vrrp_skip_check_adv_addr
+               vrrp_strict
+               vrrp_garp_interval 0
+               vrrp_gna_interval 0
+            }
+
+            vrrp_script check_mysqld {
+
+              script "/etc/keepalived/mysqlcheck/check_slave.pl 127.0.0.1"
+              interval 2
+              weight 21
+
+            }
 
 
+            vrrp_instance HA_1 {
+                state BACKUP
+                interface eth0
+                virtual_router_id 80
+                priority 100
+                advert_int 2
+                nopreempt
 
+                authentication {
+                    auth_type PASS
+                    auth_pass 1111
+                }
+
+
+                track_script {
+                check_mysqld
+                }
+
+                virtual_ipaddress {
+                    192.168.1.9/24 dev eth0
+                }
+            }
+            
+            
+            
+         DB2:
+            ! Configuration File for keepalived
+
+            global_defs {
+               notification_email {
+                 acassen@firewall.loc
+                 failover@firewall.loc
+                 sysadmin@firewall.loc
+               }
+               notification_email_from Alexandre.Cassen@firewall.loc
+               smtp_server 192.168.200.1
+               smtp_connect_timeout 30
+               router_id LVS_DEVEL
+               vrrp_skip_check_adv_addr
+               vrrp_strict
+               vrrp_garp_interval 0
+               vrrp_gna_interval 0
+            }
+
+            vrrp_script check_mysqld {
+
+              script "/etc/keepalived/mysqlcheck/check_slave.pl 127.0.0.1"
+              interval 2
+              weight 21
+
+            }
+
+
+            vrrp_instance HA_1 {
+                state BACKUP
+                interface eth0
+                virtual_router_id 80
+                priority 90
+                advert_int 2
+
+                authentication {
+                    auth_type PASS
+                    auth_pass 1111
+                }
+
+
+                track_script {
+                check_mysqld
+                }
+
+                virtual_ipaddress {
+                    192.168.1.9/24 dev eth0
+                }
+            }
+
+            
+            
+            
+         检测脚本(DB1，DB2)：/etc/keepalived/mysqlcheck/check_slave.pl 
+             
+            #!/usr/bin/perl -w
+            use DBI
+            use DBD::mysql;
+
+            $SBM = 120;
+            $db = "hellodb";
+            $host = $ARGV[0];
+            $port = 3306;
+            $user = "root";
+            $pw = "centos";
+
+            $query = "show slave status";
+            $dbh = DBI->connect("DBI:mysql:$db:$host:$port", $user, $pw, { RaiseError =>
+            0,PrintError => 0 });
+
+            if (!defined($dbh)) {
+
+              exit 1;
+            }
+            $sqlQuery = $dbh->prepare($query);
+            $sqlQuery->execute;
+            $Slave_IO_Running = "";
+            $Slave_SQL_Running = "";
+            $Seconds_Behind_Master = "";
+
+            while (my $ref = $sqlQuery->fetchrow_hashref()) {
+
+
+              $Slave_IO_Running = $ref->{'Slave_IO_Running'};
+              $Slave_SQL_Running = $ref->{'Slave_SQL_Running'};
+              $Seconds_Behind_Master = $ref->{'Seconds_Behind_Master'};
+            }
+            I
+            $sqlQuery->finish;
+            $dbh->disconnect();
+
+
+            if ( $Slave_IO_Running eq "No" || $Slave_SQL_Running eq "No") {
+
+              exit 1;
+
+            } else {
+                if ( $Second_Behind_Master > $SBM ) {
+                        exit 1;
+                   } else {
+                exit 0;	
+                   }
+
+            }
+            
+          
+        
+
+            
+            
 
