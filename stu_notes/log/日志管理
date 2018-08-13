@@ -12,8 +12,41 @@
         Priority 优先级别，从低到高排序
             debug, info, notice, warn(warning), err(error), crit(critical), alert,emerg(panic)
 
-         配置文件 ： /etc/rsyslog.conf , /etc/rsyslog.d/*.conf
-        
+         
+	 
+	 
+	 
+	 配置文件 ： /etc/rsyslog.conf , /etc/rsyslog.d/*.conf
+	 
+	     规则：
+	     
+		            
+		*.info;mail.none;authpriv.none;cron.none                /var/log/messages
+		*代表所有事件，只有大于等于info级别的事件才写入，邮件，身份验证，计划任务 不写
+		
+
+		# The authpriv file has restricted access.
+		authpriv.*                                              /var/log/secure
+
+		# Log all the mail messages in one place.
+		mail.*                                                  -/var/log/maillog
+		- 号代表异步写入，不立即写入
+
+
+		# Log cron stuff
+		cron.*                                                  /var/log/cron
+
+		# Everybody gets emergency messages
+		*.emerg                                                 :omusrmsg:*
+
+
+		# Save news errors of level crit and higher in a special file.
+		uucp,news.crit                                          /var/log/spooler
+
+		# Save boot messages also to boot.log
+		local7.*                                                /var/log/boot.log
+		计算机启动信息
+
         
   ELK：elasticsearch, logstash, kibana
         非关系型分布式数据库
@@ -24,55 +57,17 @@
 
 
 
-rsyslog 
-		/etc/rsyslog.conf
-			$Modload imudp
-			$Modload imtcp
-			*.info;mail.none;authpriv.none;vron.none   /var/log/messages
-			
-		/var/lib/rsyslog/
-			
+
 	
 
-
-
-
-
-
-
-
-
-
-远程日志；
-		  UDP：
-			vim/etc/rsyslog
-				$Modload imudp
-				$UDPServerRun 514
-				
-				authpriv         /var/log/secure    本机和远程主机都会记录日志
-				authpriv          @192.168.31.17    #往17上发送日志
-				
-			stemctl restart rsyslog
-		  TCP：
-			    $Modload imtdp
-				$TCPServerRun 514
-				authpriv         /var/log/secure   
-				authpriv          @@192.168.31.17
-				
-				
-	/var/log/btmp 		失败登陆记录
-		lastb	
-	/var/log/wtmp		成功登陆记录
-		last
-	/var/log/lastlog    最后一次成功登陆记录
+更改ssh日志类别及位置：
+	vim /etc/rsyslog.conf
+		local6.*                                                /var/log/ssh_log
+	vim /etc/ssh/sshd_conf
+		SyslogFacility local6
+	systemclt restart rsyslog
+	systemctl restart sshd
+	
+	
 		
-	/var/lib/dmesg
-		dmesg
-	/var/log/messages
-		
-			
-			
-			
-			
-			
-	rsyslog将日志记录Mysql
+
