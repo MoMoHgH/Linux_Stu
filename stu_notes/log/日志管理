@@ -1,0 +1,78 @@
+  rsyslog特性：CentOS6和7
+        
+        多线程
+        UDP, TCP, SSL, TLS, RELP
+        MySQL, PGSQL, Oracle实现日志存储
+        强大的过滤器，可实现过滤记录日志信息中任意部分
+        自定义输出格式
+        
+        facility：设施，从功能或程序上对日志进行归类
+            auth, authpriv, cron, daemon,ftp,kern, lpr, mail, news, security(auth),user, uucp, local0-local7, syslog
+        
+        Priority 优先级别，从低到高排序
+            debug, info, notice, warn(warning), err(error), crit(critical), alert,emerg(panic)
+
+         配置文件 ： /etc/rsyslog.conf , /etc/rsyslog.d/*.conf
+        
+        
+  ELK：elasticsearch, logstash, kibana
+        非关系型分布式数据库
+        基于apache软件基金会jakarta项目组的项目lucene
+        Elasticsearch是个开源分布式搜索引擎
+        Logstash对日志进行收集、分析，并将其存储供以后使用
+        kibana 可以提供的日志分析友好的 Web 界面
+
+
+
+rsyslog 
+		/etc/rsyslog.conf
+			$Modload imudp
+			$Modload imtcp
+			*.info;mail.none;authpriv.none;vron.none   /var/log/messages
+			
+		/var/lib/rsyslog/
+			
+	
+
+
+
+
+
+
+
+
+
+
+远程日志；
+		  UDP：
+			vim/etc/rsyslog
+				$Modload imudp
+				$UDPServerRun 514
+				
+				authpriv         /var/log/secure    本机和远程主机都会记录日志
+				authpriv          @192.168.31.17    #往17上发送日志
+				
+			stemctl restart rsyslog
+		  TCP：
+			    $Modload imtdp
+				$TCPServerRun 514
+				authpriv         /var/log/secure   
+				authpriv          @@192.168.31.17
+				
+				
+	/var/log/btmp 		失败登陆记录
+		lastb	
+	/var/log/wtmp		成功登陆记录
+		last
+	/var/log/lastlog    最后一次成功登陆记录
+		
+	/var/lib/dmesg
+		dmesg
+	/var/log/messages
+		
+			
+			
+			
+			
+			
+	rsyslog将日志记录Mysql
