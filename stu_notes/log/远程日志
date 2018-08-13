@@ -28,3 +28,5 @@ Server_2:
         $ModLoad imtcp
         $TCPServerRun 514
     systemctl restart rsyslog
+    
+   
