@@ -1,0 +1,16 @@
+1.
+    vim /etc/exports
+        /data/nfs1   *                                  # 共享目录可以被任何主机挂载，默认为只读挂载。
+    exportfs -r
+    
+    setfacl -m u:nfsnobody:w /data/nfs2/test.txt        # 给 test.txt 加上读权限
+    setfacl -b /data/nfs2/test.txt                      # 清楚 test.txt 的acl
+
+2.
+    /data/nfs2 192.168.1.0/24(rw,no_root_squash)        # 设置远程用户的 root 权限不压榨，对目录有读写权限
+    
+3.
+
+    
+
+  
