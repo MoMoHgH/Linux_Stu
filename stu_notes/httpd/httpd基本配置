@@ -35,8 +35,13 @@ yunm 安装：
           
           语法检查：
                    httpd -t
-     
-     
+          
+          /run/httpd/httpd.pid                 # 存放 http Master主进程的进程号
+          /var/log/httpd/access_log            # 访问日志
+          /var/log/httpd/error_log             # 错误日志
+          
+   
+   
 基本配置：
 
           初始安装，因为没有设置网站名，启动会出现如下警告信息：
@@ -44,6 +49,14 @@ yunm 安装：
           在配置文件中，设置ServerName：
                   ServerName www.test.com:80              #此名字仅具有本地意义，只是自己给自己取得名字
                   
+           centos6 中：
+                  <IfModule prefork.c>
+                  StartServers          8                 # 开机开启8个子进程 
+                  MinSpareServers       5                 # 
+                  MaxSpareServers       20                
+                  ServerLimit           256                 
+                  MaxClients            256               
+                  </IfModule>
                   
           
                   
