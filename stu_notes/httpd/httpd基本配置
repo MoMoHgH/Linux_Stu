@@ -60,31 +60,11 @@ yunm 安装：
                   </IfModule>
             vim /etc/sysconfig/httpd                      # 更改为work模式
                   HTTPD=/usr/sbin/httpd.worker
-                  
-显示 Apache 版本信息
+
+
+
+
             
-            ServerTokens
+ 
             
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-                  
-          
-
-
-
-
-
 
