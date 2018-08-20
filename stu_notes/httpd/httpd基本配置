@@ -1,0 +1,56 @@
+http 三种工作模型
+                    prefrok: 多进程I/O模型，每个进程响应一个请求，默认模型.
+                             一个主进程：生成和回收n个子进程，创建套接字，不响应请求
+                             多个子进程：工作work进程，每个子进程处理一个请求；系统初始时，预先生成多个空闲进程，等待请求，最大不超过1024个
+                             
+                     worker：复用的多进程I/O模型,多进程多线程，IIS使用此模型 
+                             一个主进程：生成m个子进程，每个子进程负责生个n个线程，每个线程响应一个请求，并发响应请求：m*n
+                     
+                     event：事件驱动模型（worker模型的变种）  
+                            一个主进程：生成m个子进程，每个进程直接响应n个请求，并发响应请求：m*n，有专门的线程来管理这些keep-alive类型的线程，当有真实请求时，将请
+                            求传递给服务线程，执行完毕后，又允许释放。这样增强了高并发场景下的请求处理能力
+                            
+                            
+ 
+
+yunm 安装： 
+           yum -y install httpd
+          
+
+相关文件：
+
+          主配置文件 ： /etc/httpd/conf/httpd.conf
+          子配置文件 ： /etc/httpd/conf.d/*.conf
+          
+          Centos6中，三种工作模型，分别对应进程
+                       /usr/sbin/httpd                          #prefork
+                       /usr/sbin/httpd.event
+                       /usr/sbin/httpd.worker
+          Centos种，三种工作模式由模块实现，分别为
+                       /usr/lib64/httpd/modules/mod_mpm_event.so
+                       /usr/lib64/httpd/modules/mod_mpm_prefork.so
+                       /usr/lib64/httpd/modules/mod_mpm_worker.so
+                                 
+          建议：http相关配置尽可能在子配置文件中更改，尽量不要更改主配置文件
+          
+          语法检查：
+                   httpd -t
+     
+     
+基本配置：
+
+          初始安装，因为没有设置网站名，启动会出现如下警告信息：
+                  AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using fe80::20c:29ff:fe55:7660. Set the 'ServerName' directive globally to suppress this message
+          在配置文件中，设置ServerName：
+                  ServerName www.test.com:80              #此名字仅具有本地意义，只是自己给自己取得名字
+                  
+                  
+          
+                  
+          
+
+
+
+
+
+
