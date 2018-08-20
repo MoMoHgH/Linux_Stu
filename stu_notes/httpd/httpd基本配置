@@ -53,11 +53,32 @@ yunm 安装：
                   <IfModule prefork.c>
                   StartServers          8                 # 开机开启8个子进程 
                   MinSpareServers       5                 # 
-                  MaxSpareServers       20                
-                  ServerLimit           256                 
-                  MaxClients            256               
+                  MaxSpareServers       20                # 
+                  ServerLimit           256               # 最多进程数,最大20000
+                  MaxClients            256               # 最多并发
+                  MaxRequestsPerChild   4000              # 
                   </IfModule>
+            vim /etc/sysconfig/httpd                      # 更改为work模式
+                  HTTPD=/usr/sbin/httpd.worker
                   
+显示 Apache 版本信息
+            
+            ServerTokens
+            
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
           
                   
           
