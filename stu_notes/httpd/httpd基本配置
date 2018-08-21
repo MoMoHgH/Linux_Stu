@@ -63,7 +63,13 @@ yunm 安装：
 
 
 
-
+centos7更改工作模型：
+              cd /etc/httpd/conf.modules.d/
+              vim 00-mpm.conf
+                    LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
+                    LoadModule mpm_worker_module modules/mod_mpm_worker.so
+                    LoadModule mpm_event_module modules/mod_mpm_event.so
+  
             
  
             
