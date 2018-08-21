@@ -1,52 +1,68 @@
-查看指定网站Web服务器的版本信息：
 
-            curl -I 192.168.1.1
+网站访问控制：
+       
+       httpd2.2中：
+            order和allow、deny放在directory, .htaccess中
+            order：定义生效次序；写在后面的表示默认法则
+                        Order allow,deny
+                        Order deny,allow
+            Allow from和Deny from：定义客户端地址
+            客户端地址：
+                        IP
+                        网络: 172.16
+                                    172.16.0.0
+                                    172.16.0.0/16
+                                    172.16.0.0/255.255.0.0
 
 
-修改对外显示 Apache 的版本信息:
+                        <files "*.txt">                     # 对于txt文件，根据规则，172.16.100.100会允许
+                        order deny,allow
+                        deny from 172.16.100.100
+                        allow from 172.16
+                        </files>
+
+
+                        <filematch “.*\.(conf|ini)$">      # 172.16.100.100 会被拒绝
+                        order allow,deny
+                        deny from 172.16.100.100
+                        allow from 172.16
+                        </filematch>            
             
-            ServerTokens Full (or not specified)
-            Server sends (e.g.): Server: Apache/2.4.2 (Unix) PHP/4.2.2 MyMod/1.2
-            ServerTokens Prod[uctOnly]
-            Server sends (e.g.): Server: Apache
-            ServerTokens Major
-            Server sends (e.g.): Server: Apache/2
-            ServerTokens Minor
-            Server sends (e.g.): Server: Apache/2.4
-            ServerTokens Min[imal]
-            Server sends (e.g.): Server: Apache/2.4.2
-            ServerTokens OS
-            Server sends (e.g.): Server: Apache/2.4.2 (Unix)
-            
-            
-            
- 修改监听的IP和端口
-            
-            Listen [IP:]PORT
-                (1) 省略IP表示为本机所有IP
-                (2) Listen指令至少一个，可重复出现多次
-                 
-                例：
-                    Listen  8080                # 修改监听8080端口
+       httpd2.4中：
+                        <FilesMatch ".+\.(conf|ini)$">      # 对于 .conf .ini 文件，只有192.168.1.2可以访问，包括自身也会被拒绝
+                        <RequireAny>
+                              Require all denied
+                              require ip 192.168.1.2
+                        </RequireAny>
+                        </FilesMatch>
+                        
+       httpd2.4中限制对指定目录的访问：
+       
+                        <Location /test>                                # 只有192.168.1.2可以访问主站点下的test目录
+                        <RequireAny>
+                           Require all denied
+                           require ip 192.168.1.2
+                        </RequireAny>
+                        </Location>
+
+
+当主页面不存在时，是否可以访问其他文件：
+                        options indexes
+
+
+
+支持软连接：
+                    options indexes FollowSymlinks
                     
-                    Listen 192.168.1.1 80       # 只能192.168.1.1访问
                     
+                    
+         
 
+           
+           
+           
+           
 
-持久连接 ： 连接建立，每个资源获取完成后不会断开连接，而是继续等待其它的请求完成，默认关闭持久连接
-            KeepAlived    On                    # 默认 On
-            KeepAliveTimeout 15                 # 持续时间15秒后断开连接，默认为5秒
-            MaxKeepAliveRequests 100            # 发起100个请求后断开
-            
-            用 telnet测试:
-                      在httpd根目录下创建几个个较大的html文件
-                      telnet 192.168.1.1 80                     # 模拟浏览器
-                      GET /index.html HTTP/1.1                  # 发GET指令获取指定页面
-                      HOST: 2.2.2.2                             # 指定你的网站IP，测试可以随便写
-                      ...                                       # 可以持续多个GET请求
-                      
-                      
-                  
             
             
             
