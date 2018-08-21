@@ -139,8 +139,6 @@ centos7更改工作模型：
             /etc/httpd/conf.d/test.conf
                 DocumentRoot "/data/web"
                 <Directory "/data/web">
-                    options Indexes FollowSymLinks
-                    AllowOverride None
                     Require all granted
                 </Directory>
 
