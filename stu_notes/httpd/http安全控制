@@ -111,7 +111,24 @@
               htpasswd -D /etc/httpd/conf.d/.htpasswd test1             # 删除用户            
            
 
-            
+            基于组验证：
+              <Directory "/data/web/secure/">
+                     AuthType Basic
+                     AuthName "Secure Login Group"
+                     AuthUserFile "/etc/httpd/conf.d/.htuser"
+                     AuthGroupFile "/etc/httpd/conf.d/.htgroup"
+              Require group g1 g2
+              
+              /etc/httpd/conf.d/
+              htpasswd -c .htuser test1
+              htpasswd  .htuser test2
+              htpasswd  .htuser test3
+              vim .htgroup
+                     g1:test1
+                     g2:test2
+                     g3:test3
+
+              
             
             
             
