@@ -60,7 +60,7 @@
             更改配置文件：
                 
                 vim /app/httpd24/conf/httpd.conf
-                user apache 100000000000000000000000000000000000000000
+                user apache 
                 group apache    
                 
             加入PATH变量：
