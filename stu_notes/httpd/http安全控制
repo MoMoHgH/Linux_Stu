@@ -16,16 +16,16 @@
 
 
                         <files "*.txt">                     # 对于txt文件，根据规则，172.16.100.100会允许
-                        order deny,allow
-                        deny from 172.16.100.100
-                        allow from 172.16
+                            order deny,allow
+                            deny from 172.16.100.100
+                            allow from 172.16
                         </files>
 
 
                         <filematch “.*\.(conf|ini)$">      # 172.16.100.100 会被拒绝
-                        order allow,deny
-                        deny from 172.16.100.100
-                        allow from 172.16
+                            order allow,deny
+                            deny from 172.16.100.100
+                            allow from 172.16
                         </filematch>            
             
        httpd2.4中：
@@ -46,17 +46,36 @@
                         </Location>
 
 
-当主页面不存在时，是否可以访问其他文件：
+当主页面不存在时，是否可以访问其他文件列表：
                         options indexes
 
 
 
 支持软连接：
-                    options indexes FollowSymlinks
+                        options indexes FollowSymlinks
                     
                     
-                    
-         
+
+
+与访问控制相关的哪些指令可以放在指定目录下的.htaccess文件中，并使之生效
+                        
+                        <Directory /data/web/test> 
+                            AllowOverride All                               # 所有指令都有效
+                            AllowOverride None                              # .htaccess 文件无效
+                            AllowOverride AuthConfig Indexes                # 除了AuthConfig 和Indexes的其它指令都无法覆盖
+                        </Directory>
+                        
+                        如果上面配置的为 AllowOverride All ，则.htaccess中的指令会生效，并覆盖之前的配置
+                        /data/web/test1/.htaccess 
+                            options indexes
+                            <FilesMatch ".+\.(conf|ini)$">
+                            <RequireAny>
+                               Require all denied
+                               require ip 192.168.1.200
+                            </RequireAny>
+                            </FilesMatch>
+
+
 
            
            
