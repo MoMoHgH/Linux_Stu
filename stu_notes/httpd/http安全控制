@@ -77,9 +77,38 @@
 
 
 
+
+
            
-           
-           
+访问非主页面下的文件夹：
+                     如：网站的主文件夹/data/web/ 下有一个 app 的文件夹 ，当访问http://x.x.x.x/app时，实际访问的是/app/test/
+                        
+                        <Directory "/app/test/">
+                            Require all granted
+                        </Directory>
+
+                        alias /appdir  /app/test
+                        
+                        
+                        
+                        
+基于用户的访问控制：
+            
+            虚拟用户：HTTP自己用于访问验证的账号。
+              /etc/httpd/conf.d/test.conf
+                     <Directory "/data/web/test/">
+                     AuthType Basic
+                     AuthName "Secure Login"
+                     AuthUserFile "/etc/httpd/conf.d/.htpasswd"
+                     Require valid-user
+                     </Directory>
+                     
+              /etc/httpd/conf.d/
+              htpasswd -c /etc/httpd/conf.d/.htpasswd test1             # 第一次创建用户时，添加-c选项
+              htpasswd  /etc/httpd/conf.d/.htpasswd test2
+              htpasswd  /etc/httpd/conf.d/.htpasswd test3
+              
+              htpasswd -D /etc/httpd/conf.d/.htpasswd test1             # 删除用户            
            
 
             
