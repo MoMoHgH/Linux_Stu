@@ -77,3 +77,29 @@
                 
                 
                 
+ 
+
+测试：
+
+        Client:
+                 for i in {1..100}; do curl 192.168.31.6; sleep 0.5; done   
+                 
+                 
+        输出结果如下：
+        
+                 This is Real Server 1
+                 This is Real Server 2
+                 This is Real Server 1
+                 This is Real Server 2
+                 This is Real Server 1
+                 This is Real Server 2
+                 This is Real Server 1
+                 This is Real Server 2
+                 This is Real Server 1
+                 This is Real Server 2
+                         ...
+
+
+
+
+
