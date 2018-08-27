@@ -40,7 +40,7 @@
                  
 保存：
       建议保存至/etc/sysconfig/ipvsadm
-              ipvsadm-save > /PATH/TO/IPVSADM_FILE
+              ipvsadm-save -n > /PATH/TO/IPVSADM_FILE
               ipvsadm -S > /PATH/TO/IPVSADM_FILE
               systemctl stop ipvsadm.service
 重载：
