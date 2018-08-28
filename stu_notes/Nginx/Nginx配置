@@ -112,12 +112,12 @@ Nginx 的配置文件主要分为四个部分：
                       
                                
 
-Select：Linux实现对应，I/O复用模型，BSD4.2最早实现
-Poll：Linux实现，对应I/O复用模型，System V unix最早实现
-Epoll：Linux实现，对应I/O复用模型，具有信号驱动I/O模型的某些特性
-Kqueue：FreeBSD实现，对应I/O复用模型，具有信号驱动I/O模型某些特性
-/dev/poll：SUN的Solaris实现，对应I/O复用模型，具有信号驱动I/O模型的某些特性
-Iocp Windows实现，对应第5种（异步I/O）模型
+Select：		Linux实现对应，I/O复用模型，BSD4.2最早实现
+Poll：		Linux实现，对应I/O复用模型，System V unix最早实现
+Epoll：		Linux实现，对应I/O复用模型，具有信号驱动I/O模型的某些特性
+Kqueue：		FreeBSD实现，对应I/O复用模型，具有信号驱动I/O模型某些特性
+/dev/poll：	SUN的Solaris实现，对应I/O复用模型，具有信号驱动I/O模型的某些特性
+Iocp: 		 Windows实现，对应第5种（异步I/O）模型
 
 
 
@@ -131,14 +131,18 @@ main :
             pid /run/nginx.pid;                                         # 指定进程ID的存储文件位置
             worker_rlimit_nofile 65535                                  # 一个 nginx 进程可以打开的最多的文件描述符数目
             include /usr/share/nginx/modules/*.conf;                    # 模块加载配置文件
-            worker_cpu_affinity 0001 0010 0100 1000;                    # 提高缓存命中率
-            worker_priority number；                                    # 指定worker进程的nice值 number取值范围 [-20,20]   
-            
+            worker_cpu_affinity 0001 0010 0100 1000;                    # 使 worker 进程跑在某颗cpu上，提高缓存命中率。
+            worker_priority number；                                    # 指定worker进程的nice值 number取值范围 [-20,19] ，默认为0 
+	    
+	    
+            daemon  on;						        # 是否以守护进程方式运行nignx, 默认 on ,off为前台运行 nginx.
+	    master_process on;						# 是否以master/worker模型运行nginx；默认为on,off 将不启动worker	
+	    
             events {                                                    # 设定 Nginx 的工作模式，以及连接数上限
                 use epoll;
                 worker_connections 1024;                                # 每个worker进程所能够打开的最大并发连接数数量
             }
-
+		
 
 
 
