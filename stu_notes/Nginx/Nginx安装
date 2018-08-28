@@ -11,7 +11,7 @@ useradd -r nginx
 --prefix=/usr/local/nginx \
 --conf-path=/etc/nginx/nginx.conf \
 --error-log-path=/var/log/nginx/error.log \
---http-logpath=/var/log/nginx/access.log \
+--http-log-path=/var/log/nginx/access.log \
 --pid-path=/var/run/nginx.pid \
 --lock-path=/var/run/nginx.lock \
 --user=nginx \
@@ -19,10 +19,16 @@ useradd -r nginx
 --with-http_ssl_module \
 --with-http_v2_module \
 --with-http_dav_module \
---withhttp_stub_status_module \
+--with-http_stub_status_module \
 --with-threads --with-file-aio
 		
 make && make install
+
+
+
+vim /etc/profile.d/nginx.sh
+	PATH=/usr/local/nginx/sbin:$PATH
+. nginx.sh
 
 
 
