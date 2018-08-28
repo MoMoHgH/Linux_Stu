@@ -3,7 +3,7 @@ http://nginx.org/packages/centos/7/x86_64/RPMS/
 
 
 
-yum install pcre-devel openssl-devel zlib-devel
+yum install pcre-devel openssl-devel zlib-devel gcc
 
 useradd -r nginx
 
