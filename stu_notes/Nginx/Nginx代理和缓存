@@ -1,0 +1,47 @@
+ngx_http_proxy_module
+
+1. 将请求转发至后端服务器
+
+        location / {
+                proxy_pass http://192.168.31.3/ ;
+        }
+        # 当客户端访问自己时，Nginx将请求转发至 后端的 192.168.31.3 服务器上
+        
+        
+2. 当后端服务器（如Web）的监听端口改为 8080时：
+
+        location / {
+                proxy_pass http://192.168.31.3:8080/ ;
+        }
+
+
+3. 跳转的服务器后面是否加 “/” 的区别：
+
+        server_name www.test.com
+        location /test {
+                proxy_pass http://192.168.31.3/ ;
+        }        
+        # 跳转结果为： http://www.test.com/test --> http://192.168.31.3
+
+
+        server_name www.test.com
+        location / {
+                proxy_pass http://192.168.31.3;
+        }
+        # 跳转结果为： http://www.test.com/test --> http://192.168.31.3/test
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
