@@ -190,9 +190,22 @@
 
 5. referer 防止盗链 : ngx_http_referer_module
               
-              
-              
+                        location / {
+                                valid_referers none block server_names *.test.com ~\.baidu\. ~\.google\.;
 
+                                if ($invalid_referer) {
+                                        return 403 http://www.baidu.com;
+                                }
+                        } 
+              
+                        # 除了来自定义的网站 ，其他来源的都将返回403
+                        # none：请求报文首部没有referer首部
+                        # blocked：请求报文有referer首部，但无有效值
+                        # server_names：参数，其可以有值作为主机名或主机名模式
+                        # arbitrary_string：任意字符串，但可使用*作通配符
+                        # regular expression：被指定的正则表达式模式匹配到的字符串,要使用~开头
+                        
+                        
 
                                           
         
