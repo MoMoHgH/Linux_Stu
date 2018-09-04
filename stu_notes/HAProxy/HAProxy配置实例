@@ -1,0 +1,45 @@
+ACL 常见规则示例：
+      1.
+        acl www_policy     hdr_reg(host)    -i      ^(www.test1.com|test1.com)
+        acl bbs_policy     hdr_dom(host)    -i      bbs.test1.com
+        acl url_policy     url_sub          -i      buy_sid=
+        
+        use_backend       server_www        if      www_policy
+        use_backend       server_app        if      url_policy
+        use_backend       server_bbs        if      bbs_policy
+        default_backend       server_cache
+        
+        此处定义了三条 ACL 规则 ： www_policy  bbs_policy  url_policy 
+                                  第一条规则表示 ： 客户端请求的 host 中 如果是以 www.test1.com 和 test1.com 开头的，返回 True
+                                  第二条规则表示 ： 客户端请求的 host 中 如果是以 bbs.test1.com为域名，返回 True
+                                  第三条规则表示 ： 客户端请求的 url 中 如果包含 "buy_sid="字符串，返回True
+                                  
+        后面为四条定义了如果匹配 ACL ，则会调用哪个后端服务器。如果不匹配，调用默认。
+
+
+
+      2.
+
+        acl url_static     path_end                 .gif .png .jpg .css .js
+        acl host_www       hdr_beg(host)    -i      www
+        acl host_static    hdr_beg(host)    -i      img. video. download. ftp.
+        
+        use_backend       static            if  host_static || host_www url_static
+        use_backend       www               if  host_www
+        default_backend       server_cache
+
+        此处也定义了三条 ACL 规则 ： url_static  host_www  host_static 
+                                  第一条规则表示 ： 客户端请求的中URL的 path 部分 如果是以 .gif .png .jpg .css .js 结尾的，返回 True
+                                  第二条规则表示 ： 客户端请求的 host 中 如果是以 www 开头，返回 True
+                                  第三条规则表示 ： 客户端请求的 host 中 如果是以 img. video. download. ftp.开头，返回True
+        第四，五规则定义了如果同时匹配 host_static 和 url_static，或者同时匹配 host_www 和 url_static，则会调用哪个后端服务器。
+        如果不匹配，调用默认。
+
+
+
+
+
+
+
+
+
