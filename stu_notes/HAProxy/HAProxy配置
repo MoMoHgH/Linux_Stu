@@ -17,7 +17,7 @@ HAProxy 配置文件有5部分组成
               
  （4） backend
         
-     此部分用于设置集群后端服务集群的配置，也就是添加一组真实的服务器。添加的真是服务器类似于 LVS 的 real server 节点
+     此部分用于设置集群后端服务集群的配置，也就是添加一组真实的服务器。添加的真实服务器类似于 LVS 的 real server 节点
         
         
  （5） listen 
@@ -114,9 +114,64 @@ HAProxy 配置详解：
                                                              
         cookie    SERVERID                   # 表示可以向cookie插入 ServerID
         option    httpchk GET /index.php     # 启用 HTTP 的服务状态检测功能
+                                             # 格式为 : option httpchk <method> <uri> version
+                                             # metod : 表示 HTTP请求的方式，常有的方式为 GET HEAD OPTION 几种。一般用的健康检查方式为 HEAD，
+                                             #         因为 HEAD 没有数据返回，仅检查Response 的HEAD 状态码是不是 200.
+                                             # uri   : 要检查的 URL 地址
+                                             # version : 指定要检查时的HTTP版本号
+                                             
         server    web1 172.18.1.1:80  cookie server1 weight 6 check inter 2000 rise 2 fall 3
         server    web2 172.18.1.2:80  cookie server2 weight 6 check inter 2000 rise 2 fall 3
-        
+                                              # 定义多台后端服务器。 格式为： server <name> <address> [:port] [param*]
+                                              # name : 为后端服务器指定一个内部名称。
+                                              # address : 后端真是服务器 IP 或主机名
+                                              # port    : 后端服务器服务的监听端口
+                                              # param   : 为后端服务器设定一系列参数，参数可以为：
+                                                        check : 启用对后端服务器的健康状态检查
+                                                        inter : 设置健康状态检查的时间间隔，单位为毫秒
+                                                        rise  : 多少次检查成功才表示为服务器可用，即从故障状态到健康状态需要几次健康性检查
+                                                        fall  : 多少次检查失败才表示服务器故障。
+                                                        cookie : 为指定的后端服务器设定 cookie 值，此处指定的值将在请求入站时被检查，第一次
+                                                                 为此值挑选的后端服务器将会在后续的请求中一直被选中。
+                                                        weight : 设置权重，默认1 范围 0-256 ，0为不参与负载均衡
+                                                        backup : 设置为备份服务器，只有其他服务器均不可用，才会启用。
+                                                        
+                                                        
+
+
+ （5） listen
+      
+     listen admin_stats         # 定义一个名字为 ‘admin_stats’ 的实例，其实就是定义了一个HAProxy 的监控页面。
+         bind  0.0.0.0:9188                    
+         mode http
+         log 127.0.0.1 local0 err
+         stats refresh 30s                       # 监控统计页面的自动刷新时间
+         stats uri /haproxy-status               # 设定监控页面URL路径，可以随意指定。此处设定就可以用 http://IP:9188/haproxy-status 来查看
+         stats realm welcome login\ Haproxy      # 设置输入密码时的提示信息
+         stats auth admin:admin~!@               # 设定监控页面登陆的账号密码 ，账号密码用 ":" 隔开. 可设置多个，每行一个
+         stats hide-version                      # 用来隐藏页面上 HAProxy 的版本信息 
+         stats admin if TRUE                     # 设置此项可以在监控页面上手工启用或禁用后端服务器。
+         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
