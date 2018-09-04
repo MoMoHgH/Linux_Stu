@@ -155,10 +155,96 @@ HAProxy 配置详解：
 
 
 
+ACL 规则实现智能负载均衡
+     
+     格式 ： acl    自定义acl名称    acl方法   [flags]  [匹配的路径或文件]
+          
+         flags :
+              -i : 忽略大小写
+              -f filename : 从文件中载入模式
+              -m method : 指定模式匹配方法
+              -n : 禁止DNS解析
+              -M : -f 载入的文件作为映射文件使用
+              -u : 强制ACL的名称唯一
+              -- : 强制结束flag结束，避免了字符串中含有的- 引起混淆
+              
+              其中flag中的 -m 选项可使用的模式匹配方法如下，需要说明的是有些方法已被默认指定无需声明，例如int，ip
+              
+              
+                   "found" : 只是用来探测数据流中是否存在指定数据，不进行任何比较
+                   "bool" : 检查结果返回布尔值。匹配没有模式，可以匹配布尔值或整数，不匹配0和false，其他值可以匹配
+                   "int" : 匹配整数类型数据；可以处理整数和布尔值类型样本，0代表false，1代表true
+                   "ip" : 匹配IPv4，IPv6地址类型数据。该模式仅被IP地址兼容，不需要特别指定
+                   "bin" : 匹配二进制数据
+                   "len" : 匹配样本的长度的整数值
+                   "str" : 精确匹配，根据字符串匹配文本
+                   "sub" : 子串匹配，匹配文本是否包含子串
+                   "reg" : 正则匹配，根据正则表达式列表匹配文本
+                   "beg" : 前缀匹配，检查文本是否以指定字符串开头
+                   "end" : 后缀匹配，检查文本是否以指定字符串结尾
+                   "dir" : 子目录匹配，检查部分文本中以" / "作为分隔符的内容是否含有指定字符串
+                   "dom" : 域匹配。检查部分文本中以" . "作为分隔符的内容是否含有指定字符串
+
+
+         acl方法：
+         
+          例如 一个连接为: <scheme>://<user>:<password>@<host>:<port>/<path>;<params>?<query>#<frag>
+         
+          base : string
+          
+                 匹配的部分为： <host>:<port>/<path>;<params>
+                 
+                 base : exact string match    精确匹配
+                 base_beg : prefix match      前缀匹配
+                 base_dir : subdir match      目录匹配
+                 base_dom : domain match      域匹配
+                 base_end : suffix match      后缀匹配
+                 base_len : length match      长度匹配
+                 base_reg : regex match       正则匹配
+                 base_sub : substring match   字串匹配
+         
+         
+          path : string     
+          
+                 匹配的部分为：/<path>;<params>
+                   
+                 path : exact string match
+                 path_beg : prefix match
+                 path_dir : subdir match
+                 path_dom : domain match
+                 path_end : suffix match
+                 path_len : length match
+                 path_reg : regex match
+                 path_sub : substring match
+
+
+          url : string
+          
+                匹配整个URL
+                                  
+                url ：exact string match
+                url_beg : prefix match
+                url_dir : subdir match
+                url_dom : domain match
+                url_end : suffix match
+                url_len : length match
+                url_reg : regex match
+                url_sub : substring match
 
 
 
+         req.hdr
+         
+               提取http请求的指定首部字段值
 
+               hdr([<name>[,<occ>]]) : exact string match
+               hdr_beg([<name>[,<occ>]]) : prefix match
+               hdr_dir([<name>[,<occ>]]) : subdir match
+               hdr_dom([<name>[,<occ>]]) : domain match
+               hdr_end([<name>[,<occ>]]) : suffix match
+               hdr_len([<name>[,<occ>]]) : length match
+               hdr_reg([<name>[,<occ>]]) : regex match
+               hdr_sub([<name>[,<occ>]]) : substring match
 
 
 
