@@ -1,0 +1,213 @@
+·
+                    +----------------+----------------+-------------------+---------------+-------------------+
+                    |  hostname      | system version |   tools version   |      IP       |        域名       |
+                    |----------------|----------------|-------------------|---------------|-------------------+
+                    |    HAProxy     |   CentOS 7.5   |  HAProxy-1.5.18   |  192.168.1.1  |                   |
+                    |----------------|----------------|-------------------|---------------+-------------------+
+                    |    www_srvs1   |   CentOS 7.5   |  mariadb-10.2.16  |  192.168.31.2 |                   |
+                    +----------------+----------------+-------------------+---------------+     www.tb.com    |
+                    |    www_srvs2   |   CentOS 7.5   |  mariadb-10.2.16  |  192.168.31.3 |         or        |
+                    +----------------+----------------+-------------------+---------------+       tb.com      |                    
+                    |    www_srvs3   |   CentOS 7.5   |  mariadb-10.2.16  |  192.168.31.4 |                   |
+                    +----------------+----------------+-------------------+---------------+-------------------+
+                    |    bbs_srvs1   |   CentOS 7.5   |  mariadb-10.2.16  |  192.168.31.5 |                   |
+                    +----------------+----------------+-------------------+---------------+   www.bbs.tb.com  |
+                    |    bbs_srvs2   |   CentOS 7.5   |  mariadb-10.2.16  |  192.168.31.6 |                   |
+                    +----------------+----------------+-------------------+---------------+-------------------+
+                    |    blog_srvs1  |   CentOS 7.5   |  mariadb-10.2.16  |  192.168.31.7 |                   |
+                    +----------------+----------------+-------------------+---------------+    blog.tb.com    |
+                    |    blog_srvs2  |   CentOS 7.5   |  mariadb-10.2.16  |  192.168.31.8 |                   |
+                    +----------------+----------------+-------------------+---------------+-------------------+
+                    |    def_srvs1   |   CentOS 7.5   |  mariadb-10.2.16  |  192.168.31.9 |                   |
+                    +----------------+----------------+-------------------+---------------+       default     |
+                    |    def_srvs1   |   CentOS 7.5   |  mariadb-10.2.16  | 192.168.31.10 |                   |
+                    +----------------+----------------+-------------------+---------------+-------------------+                    
+                                                          基本配置环境
+
+
+
+HAProxy :
+       安装 haproxy
+            yum install haproxy -y
+       
+       日志配置项：
+              
+              vim /etc/rsyslog.d/haproxy.conf
+                  $ModLoad imudp
+                  $UDPServerRun 514
+                  local3.* /var/log/haproxy/haporxy.log             # local0-7 ， haproxy 配置文件中会用到这里定义的日志设备 
+                  local0.* /var/log/haproxy/haporxy.log 
+       重启日志 rsyslog 服务
+              systemctl restart rsyslog          
+
+       配置 haproxy配置文件： 
+       
+              global
+                  log         127.0.0.1 local0 info
+
+                  maxconn    4096
+                  chroot      /var/lib/haproxy
+                  pidfile     /var/run/haproxy.pid
+                  user        haproxy
+                  group       haproxy
+                  daemon
+
+
+
+
+              defaults
+                  mode                    http
+                  log                     global
+                  retries                 3
+                  timeout connect         5s
+                  timeout client          10s
+                  timeout server          30s
+                  timeout check           22
+
+
+
+
+              listen admin_stats
+                bind 		0.0.0.0:2524
+                mode		http
+                log 		127.0.0.1 local0 err
+                stats	refresh		30s
+                stats   uri	/haproxy-status
+                stats   realm   welcome login\ Haproxy
+                stats  auth  hgh:centos
+                stats  auth  qjj:centos
+                stats  hide-version
+                stats  admin if TRUE
+
+
+
+
+
+              frontend  www
+                  bind 	*:80
+                  mode 	http
+                  option 	httplog
+                  option 	forwardfor
+                  log		global
+
+                  acl host_www         hdr_reg(host)       -i  ^(www.tb.com|tb.com)
+                  acl host_bbs         hdr_dom(host)       -i  bbs.tb.com
+                  acl host_blog        hdr_beg(host)       -i  blog.
+
+                  use_backend  server_www         if  host_www
+                  use_backend  server_bbs         if  host_bbs
+                  use_backend  server_blog        if  host_blog
+                  default_backend                 server_default
+
+
+
+
+
+
+              backend server_default
+                  mode   	http
+                  option      redispatch
+                  option      abortonclose
+                  balance     roundrobin
+                  cookie      SERVERID
+                  option      httpchk   GET  /check_status.html
+                  server      def_srvs1 192.168.31.9:80  cookie def_srvs1 weight 3 check inter 2000 rise 2 fall 3
+                  server      def_srvs2 192.168.31.10:80 cookie def_srvs2 weight 3 check inter 2000 rise 2 fall 3
+
+
+              backend server_www
+                  mode   	http
+                  option      redispatch
+                  option      abortonclose
+                  balance     roundrobin
+                  cookie      SERVERID
+                  option      httpchk   GET  /check_status.html
+                  server      www_srvs1 192.168.31.2:80  cookie www_srvs1 weight 6 check inter 2000 rise 2 fall 3
+                  server      www_srvs2 192.168.31.3:80  cookie www_srvs2 weight 6 check inter 2000 rise 2 fall 3
+                  server      www_srvs3 192.168.31.4:80  cookie www_srvs3 weight 6 check inter 2000 rise 2 fall 3
+
+
+
+              backend server_bbs
+                  mode   	http
+                  option      redispatch
+                  option      abortonclose
+                  balance     source
+                  cookie      SERVERID
+                  option      httpchk   GET  /check_status.html
+                  server      bbs_srvs1 192.168.31.5:80  cookie bbs_srvs1 weight 3 check inter 2000 rise 2 fall 3
+                  server      bbs_srvs2 192.168.31.6:80  cookie bbs_srvs2 weight 3 check inter 2000 rise 2 fall 3
+
+
+
+              backend server_blog
+                  mode   	http
+                  option      redispatch
+                  option      abortonclose
+                  balance     roundrobin
+                  cookie      SERVERID
+                  option      httpchk   GET  /check_status.html
+                  server     blog_srvs1 192.168.31.7:80  cookie blog_srvs1 weight 3 check inter 2000 rise 2 fall 3
+                  server     blog_srvs2 192.168.31.8:80 cookie blog_srvs2 weight 3 check inter 2000 rise 2 fall 3
+
+
+
+
+
+
+测试：
+      在 www_srvs1  www_srvs2  www_srvs3 上分别定义主页面，和健康检测页面：
+         
+         主页面 ：
+         
+            echo  “This is www server1 on 192.168.31.2 ” > /var/www/html/index.html
+            echo  “This is www server2 on 192.168.31.3 ” > /var/www/html/index.html    
+            echo  “This is www server3 on 192.168.31.4 ” > /var/www/html/index.html        
+            
+         健康检测页面 ：
+            echo "This is check_status Page on 192.168.31.2" > /var/www/html/check_status.html
+            echo "This is check_status Page on 192.168.31.3" > /var/www/html/check_status.html
+            echo "This is check_status Page on 192.168.31.4" > /var/www/html/check_status.html
+      
+      
+      在 bbs_srvs1  bbs_srvs2 上分别定义主页面，和健康检测页面：
+      
+         主页面 ：
+         
+            echo  “This is bbs server1 on 192.168.31.5 ” > /var/www/html/index.html
+            echo  “This is bbs server2 on 192.168.31.6 ” > /var/www/html/index.html
+
+         健康检测页面 ：
+            echo "This is check_status Page on 192.168.31.5" > /var/www/html/check_status.html
+            echo "This is check_status Page on 192.168.31.6" > /var/www/html/check_status.html
+
+      在 blog_srvs1  blog_srvs2 上分别定义主页面，和健康检测页面：
+      
+         主页面 ：
+         
+            echo  “This is blog server1 on 192.168.31.7 ” > /var/www/html/index.html
+            echo  “This is blog server2 on 192.168.31.8 ” > /var/www/html/index.html
+
+         健康检测页面 ：
+            echo "This is check_status Page on 192.168.31.7" > /var/www/html/check_status.html
+            echo "This is check_status Page on 192.168.31.8" > /var/www/html/check_status.html
+
+
+      在 def_srvs1  def_srvs2 上分别定义主页面，和健康检测页面：
+      
+         主页面 ：
+         
+            echo  “This is default server1 on 192.168.31.9 ” > /var/www/html/index.html
+            echo  “This is default server2 on 192.168.31.10 ” > /var/www/html/index.html
+
+         健康检测页面 ：
+            echo "This is check_status Page on 192.168.31.9" > /var/www/html/check_status.html
+            echo "This is check_status Page on 192.168.31.10" > /var/www/html/check_status.html
+
+
+
+
+
+ 测试细节忽略    
+
+
