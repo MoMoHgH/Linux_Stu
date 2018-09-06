@@ -1,0 +1,77 @@
+1. Varnish 的配置文件
+
+    /etc/varnish/varnish.params         # 用来进行 Varnish 自身的一些配置
+          VARNISH_VCL_CONF=/etc/varnish/default.vcl     # 指定 vcl 文件路径，可以随意写
+          VARNISH_LISTEN_PORT=6081                      # Varnish 的监听接口
+          
+          VARNISH_ADMIN_LISTEN_ADDRESS=127.0.0.1        # 管理 Varnish 的 IP 和接口
+          VARNISH_ADMIN_LISTEN_PORT=6082
+          VARNISH_SECRET_FILE=/etc/varnish/secret       # 预共享密钥，做身份验证的对称密钥
+          
+          VARNISH_STORAGE="malloc,256M"                 # 内存存储，[,size]用于定义空间大小；重启后所有缓存项失效
+          #VARNISH_STORAGE="file,/var/lib/varnish/varnish.bin,20G"
+                                                        #  磁盘文件存储，黑盒；重启后所有缓存项失效；
+                                                        #  persistent,path,size    文件存储，黑盒；重启后所有缓存项有效     
+          
+          VARNISH_USER=varnish                          #  指定进程的用户身份，用磁盘存储时，注意要对指定路径有写权限
+          VARNISH_GROUP=varnish
+  
+  
+  
+  
+  
+2. varnishadm :
+       登陆：
+          varnishadm [-n ident] [-t timeout] [-S secretfile] -T [address]:port command [...]
+                -S 指明认证文件路径
+                -T 连接的地址和端口
+          例： varnishadm -S /etc/varnish/secret -T 127.0.0.1:6082
+       
+       登陆后：
+          help                                  # 列出可用命令列表      
+              help    
+              ping                              # 探测服务器存活性      
+              auth                              # 做认证
+              quit                              # 退出
+              banner                            # 输出欢迎信息
+              status                            # 查看服务进程状态                         
+              start                             # 启动 Vanish
+              stop                              # 停止 Vanish
+              vcl.load                          # 
+              vcl.inline       
+              vcl.use                           # 切换 VCL
+              vcl.discard                       # 删除 VCL
+              vcl.list                          # 列出正在使用的 VCL
+              param.show                        # 查看服务器内部进程参数
+              param.set 
+              panic.show                        # 内部出现故障，获取排障信息
+              storage.list                      # 列出存储系统
+              vcl.show                          # 查看 vcl 配置
+              backend.list                      # 列出后端服务器
+              backend.set_health
+              ban
+              ban.list
+
+
+3. Varnish 配置示例：
+                      vcl 配置文件为 /etc/varnishi/default.vcl
+                      后端两个 Web 服务器，IP分别为 ： 192.168.31.3 192.168.31.4
+                      
+                      
+      （1） 为缓存服务器添加后端服务器
+              backend default {
+                  .host = "192.168.31.3";
+                  .port = "80";
+              }
+              # 添加了一个默认后端服务器，IP 为192.168.31.3 ，端口号为 80。
+              
+              两种编译重载方式：
+                  varnish_reload_vcl            # 在命令行直接执行
+                  vcl.load test1 default.vcl    # 登陆到 varnishadm 
+                  
+      （2）
+               
+                  
+  
+
+     
