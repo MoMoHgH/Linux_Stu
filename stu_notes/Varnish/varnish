@@ -52,20 +52,29 @@ Varnish : 拥有强大的缓存管理能力，和缓存系统管理能力，是n
                    "s-maxage" "=" delta-seconds       公共缓存可以使用多长时间  
                            
                             
+     Varnish 的状态引擎主要有：
+	 			
+			    前端：
+					vcl_recv                         # 接受用户请求，并判断是否为标准的请求
+					vcl_pipe						 # 由 vcl_recv 判断为非标准请求时，将被送到此处
+					vcl_hash						 # 由 vcl_recv 判断为标准请求时，将被送到此处
+					vcl_hit							 # 由 vcl_hash 判断为命中，则送到此处
+					vcl_miss						 # 由 vcl_hash 判断为非命中，则送到此处
+					vcl_pass
+					vcl_purge						 # 做缓存清理
+					vcl_synth
+					vcl_deliver
+				
+				后端：	
+					vcl_backend_fetch
+					vcl_backend_response
+					vcl_backend_error
+					
+	 配置文件 ：
+		    
+			/etc/varnish/varnish.params              # 配置守护进程工作特性
+			/etc/varnish/default.vcl				 # 配置缓存系统
 
-
-	 malloc[,size]
-	 
-		 内存存储，[,size]用于定义空间大小；重启后所有缓存项失效；
-                 例： VARNISH_STORAGE="malloc,256M"
-            
-            
-	file[,path[,size[,granularity]]]
-	 	 磁盘文件存储，黑盒；重启后所有缓存项失效；
-            	 例： VARNISH_STORAGE="file,/var/lib/varnish/varnish.bin,20G"
-        
-	persistent,path,size
-		 文件存储，黑盒；重启后所有缓存项有效
 
 
 
