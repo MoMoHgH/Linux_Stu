@@ -7,62 +7,65 @@
                      当客户端向数据库请求，根据提示，是否允许将数据缓存到memcached。当下次查询时，先查询memcached，如果未命中，再去直接查询数据库
       缓存机制：
               HTTP/1.0
-                    Expires：根据绝对时间。此方式缺点为：对时间一致性要求很较高，当缓存服务器和代理服务器的时间不一样时，就会出现问题。           
+                    Expires：根据绝对时间。此方式缺点为：对时间一致性要求很高，当缓存服务器和代理服务器的时间不一样时，就会出现问题。           
               HTTP/1.1
                     条件式请求：代理端会发送请求，询问缓存是否过期，这个过程不会发送缓存数据本身，会极大节约带宽。
-                          Last-Modified/If-Modified-Since：基于文件的修改时间戳来
-                                此判别方式缺点为：当文件在短时间内修改多次时，文件的修改时间戳却是一样的
+                          Last-Modified/If-Modified-Since：基于文件的修改时间
+                                此判别方式缺点为：当文件在短时间内修改多次时，文件的修改时间戳确是一样的
                           Etag/If-None-Match：基于文件的校验码来判别
                           
                           过期时间：缓存服务器得到缓存数据后，会得到一个过期时间。当到了过期时间，缓存服务器不会立马删除缓存数据，会先去询问
                                    数据服务器缓存是否发生改变。如果没变，数据服务器会再给代理服务器一个过期时间，这样就减少了询问的次数。
-                    Cache-Control ：key1=value1,key2=value2,...         控制缓存功能
-                            请求报文用 Cache-Control 是告诉缓存服务器该怎么响应
-                            响应报文用 Cache-Control 是告诉缓存服务该怎么缓存
-                            
-                          请求报文用于通知缓存服务如何使用缓存响应请求：
-                              			"no-cache"，    表示不管是不是最新的，必须到原始服务器上再问一次                   
-                                    "no-store"      表示不能用缓存向应，必须到原始服务器上取数据                   
-                                    "max-age" "=" delta-seconds        
-                                    "max-stale" [ "=" delta-seconds ]     过期后，还能使用多久 
-                                    "min-fresh" "=" delta-seconds      
-                                    "no-transform"                    
-                                    "only-if-cached"                  
-                                    cache-extension 
-                            
-                            
-                        	响应报文用于通知缓存服务器如何存储上级服务器响应的内容：    
-                            "private" : 表示只能被私有缓存所缓存
-                            "public"  : 表示公共和私有都可以缓存
-                            "no-cache" [ "=" <"> 1#field-name <"> ]，可缓存，但响应给客户端之前需要revalidation，即必须发出条件式请求进行缓存有效性验正；
-                            "no-store" ，不允许存储响应内容于缓存中；                           
-                            "no-transform"                        
-                            "must-revalidate"                     
-                            "proxy-revalidate"                  
-                            "max-age" "=" delta-seconds       私有缓存可以使用多长时间        
-                            "s-maxage" "=" delta-seconds       公共缓存可以使用多长时间  
-                            cache-extension 
-                            
-                            
+				   
+
 
 
 Varnish : 拥有强大的缓存管理能力，和缓存系统管理能力，是nginx所不具备的。
-         			Manager进程
-			        Cacher进程，包含多种类型的线程   
+
+				   
+     Cache-Control ：key1=value1,key2=value2,...         控制缓存功能
+     
+             请求报文用 Cache-Control 是告诉缓存服务器该怎么响应
+             响应报文用 Cache-Control 是告诉缓存服务该怎么缓存
 
 
-			  malloc[,size]
-				    内存存储，[,size]用于定义空间大小；重启后所有缓存项失效；
-            VARNISH_STORAGE="malloc,256M"
+     请求报文用于通知缓存服务如何使用缓存响应请求：
+                   "no-cache"，    表示不管是不是最新的，必须到原始服务器上再问一次                   
+                   "no-store"      表示不能用缓存向应，必须到原始服务器上取数据                   
+                   "max-age" "=" delta-seconds        
+                   "max-stale" [ "=" delta-seconds ]     过期后，还能使用多久 
+                   "min-fresh" "=" delta-seconds      
+                   "no-transform"                    
+                   "only-if-cached"                  
+
+                            
+                            
+     响应报文用于通知缓存服务器如何存储上级服务器响应的内容：    
+                   "private" : 表示只能被私有缓存所缓存
+                   "public"  : 表示公共和私有都可以缓存
+                   "no-cache" [ "=" <"> 1#field-name <"> ]，可缓存，但响应给客户端之前需要revalidation，即必须发出条件式请求进行缓存有效性验正；
+                   "no-store" ，不允许存储响应内容于缓存中；                           
+                   "no-transform"                        
+                   "must-revalidate"                     
+                   "proxy-revalidate"                  
+                   "max-age" "=" delta-seconds       私有缓存可以使用多长时间        
+                   "s-maxage" "=" delta-seconds       公共缓存可以使用多长时间  
+                           
+                            
+
+
+	 malloc[,size]
+	 
+		 内存存储，[,size]用于定义空间大小；重启后所有缓存项失效；
+                 例： VARNISH_STORAGE="malloc,256M"
             
             
-			  file[,path[,size[,granularity]]]
-				    磁盘文件存储，黑盒；重启后所有缓存项失效；
-            VARNISH_STORAGE="file,/var/lib/varnish/varnish.bin,20G"
-            
-            
-			  persistent,path,size
-				    文件存储，黑盒；重启后所有缓存项有效
+	file[,path[,size[,granularity]]]
+	 	 磁盘文件存储，黑盒；重启后所有缓存项失效；
+            	 例： VARNISH_STORAGE="file,/var/lib/varnish/varnish.bin,20G"
+        
+	persistent,path,size
+		 文件存储，黑盒；重启后所有缓存项有效
 
 
 
