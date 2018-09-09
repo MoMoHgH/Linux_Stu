@@ -1,0 +1,90 @@
+1. Tomcat manager 管理工具  
+        /etc/tomcat/tomcat-users.xml
+            <role rolename="manager-gui"/>
+            <user username="tomcat" password="qwe123" roles="manager-gui"/>
+        systemctl restart tomcat
+        在浏览器输入 ： http://192.168.1.1:8080/manager 进入管理界面
+                部署：
+                    Context Path (required): /test         # 部署的路径 ，即将来可以通过 http://192.168.1.1:8080/test 访问到
+                    WAR or Directory URL：/app/myapp       # WAR 包所在路径
+                    
+
+2. 8005端口
+        <Server port="8005" shutdown="SHUTDOWN">
+            此为 tomcat 管理端口的默认配置，监听8005端口，并且接受 SHUTDOWN 指令，用 telnet 连接到此端口，通过此指令可以关闭 Tomcat,不安全
+            可以将 监听端口改为 -1 ，或者将 “SHUTDOWN“ 改为较为复杂的字符串
+            
+
+
+3. Connector : http https ajp 
+        
+        Connector 组件用来监听接口，接受请求，支持三种协议： http https ajp 。生产中尽量不用 https ,因为它的开销很大，而且
+        在内网中没必要使用加密。默认配置，启用了 http ajp 两种协议，当我们只使用其中一种服务时，建议关闭另一个。
+                <Connector port="8080" protocol="HTTP/1.1"
+                   connectionTimeout="20000"
+                   redirectPort="8443" />
+                # HTTP   
+                   
+                <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
+                # ajp
+                
+
+4. 定义 host 虚拟主机
+                       
+           /etc/tomcat/server.xml
+                      <Host name="www.test.com"  appBase="/app/myapps"
+                            unpackWARs="true" autoDeploy="true">
+                      </Host>
+                      # 定义虚拟主机名为 www.test.com ,根目录为 /app/myapps
+                      
+            mkdir -p /app/myapps/ROOT/{classes,lib,META-INF,WET-INF}
+            vim /app/myapps/ROOT/index.jsp
+                <%@ page language="java" %>
+                <html>
+                        <head><title>TomcatA</title></head>
+                        <body>
+                                <h1><font color="orange">Test Page : TomcatA</font></h1>
+                                <table align="centre" border="1">
+                                        <tr>
+                                        <td>Session ID</td>
+                                        <% session.setAttribute("testsession","testsession"); %>
+                                        <td><%= session.getId() %></td>
+                                        </tr>
+                                        <tr>
+                                                <td>Created on</td>
+                                                <td><%= session.getCreationTime() %></td>
+                                        </tr>
+                                </table>
+                        </body>
+                </html>
+            # 定义测试主页
+            重启 Tomcat
+            systemctl restart tomcat
+            
+            在浏览器输入 www.test.com:8080  ，进行测试
+
+
+5. 定义 context
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
