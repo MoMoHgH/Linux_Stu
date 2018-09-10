@@ -1,4 +1,5 @@
-1. Tomcat manager 管理工具  
+1. Tomcat manager host-manager 管理工具
+      （1）manager
         /etc/tomcat/tomcat-users.xml
             <role rolename="manager-gui"/>
             <user username="tomcat" password="qwe123" roles="manager-gui"/>
@@ -7,7 +8,12 @@
                 部署：
                     Context Path (required): /test         # 部署的路径 ，即将来可以通过 http://192.168.1.1:8080/test 访问到
                     WAR or Directory URL：/app/myapp       # WAR 包所在路径
-                    
+      
+      （2）host-manager 虚拟主机管理器
+        /etc/tomcat/tomcat-users.xml
+            <role rolename="admin-gui"/>
+            <user username="tomcat" password="qwe123" roles="admin-gui"/>      
+      
 
 2. 8005端口
         <Server port="8005" shutdown="SHUTDOWN">
@@ -64,24 +70,128 @@
             在浏览器输入 www.test.com:8080  ，进行测试
 
 
-5. 定义 context
+5. 定义 context (Web 下的单个应用)
+        （1）URL 路径位于虚拟主机根目录下
+                /app/
+                └── myapps
+                    ├── ROOT
+                    │   ├── classes
+                    │   ├── index.jsp
+                    │   ├── lib
+                    │   ├── META-INF
+                    │   └── WET-INF
+                    └── test1
+                        ├── classes
+                        ├── index.jsp
+                        ├── lib
+                        ├── META-INF
+                        └── WET-INF
+             <Host name="www.test.com"  appBase="/app/myapps"
+                    unpackWARs="true" autoDeploy="true">
+                    <Context path="/test1" docBase="test1" reloadable="">
+                    </Context>
+             </Host>
+             # 此处定义了虚拟主机 www.test.com ,根目录为 /app/myapps。同时在Context中定义了一个 test1 的应用，path 指定了URL路径，docBase 
+               定义了 test1 应用所在路径，此处因为是在虚拟主机的根目录下，可以使用相对路径。使用 www.test.com/test1 ，即可访问此应用。
+               因为是在虚拟主机的根目录下，即使不配置Context，也是可以被 Tomcat 自动部署的。
 
-
-
-
-
+        （2）URL 路径不在虚拟主机根目录下
         
+                /app/
+                ├── latest -> test2/
+                ├── myapps
+                │   └── ROOT
+                │       ├── classes
+                │       ├── index.jsp
+                │       ├── lib
+                │       ├── META-INF
+                │       └── WET-INF
+                └── test2
+                    ├── classes
+                    ├── index.jsp
+                    ├── lib
+                    ├── META-INF
+                    └── WET-INF
+
+              <Host name="www.test.com"  appBase="/app/myapps"
+                       unpackWARs="true" autoDeploy="true">
+                       <Context path="/test2" docBase="/app/latest" reloadable="">
+                       </Context>
+              </Host>
+              # 此处使用软连接，latest 文件指向 /app/test2 ，在 Context 中定义了 latest 文件路径。这样当 test2 的版本发生改变时，只需将
+                latest 指向新版本就行，不需要再修改配置文件。
+
+
+
+
+6. 定义 Value 组件 ：
+
+	      定义访问日志：org.apache.catalina.valves.AccessLogValve
+	      定义访问控制：org.apache.catalina.valves.RemoteAddrValve
+              
+              实例1：  
+              
+              <Host name="www.test.com"  appBase="/app/myapps"
+                   unpackWARs="true" autoDeploy="true">              
+		   <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+		        prefix="www.test.com" suffix=".txt"
+			pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+              </Host>                
+              #  此处定义了虚拟主机的访问日志。directory 为日志的路径，此处使用了相对路径。prefix 定义了日志文件命名的开头部分，
+                 suffix 定义了日志文件命名的结束部分。pattern 定义了日志文件的格式。
+                      
+                      
+              实例2：
+              
+              <Valve className="org.apache.catalina.valves.RemoteAddrValve" deny="192\.168\.1\.2"/>
+              # 此处定义了虚拟主机的访问控制权限，deny 定义了拒绝 912.168.1.2 主机的访问。
 
 
 
 
 
+7. 实现 LNMT
+    （1）Nginx 和 Tomcat 在一台服务器上。
+    
+         配置 Nginx ：     
+         vim /etc/nginx/conf.d/test.conf
+                server {
+                        server_name www.app.com;
+                        root /data/web/html;
+                        index index.jsp index.html;
+                        location / {
+                                proxy_pass http://www.test.com:8080/;
+                        }
+                }
+         配置 Tomcat :
+             此处忽略，使用前面配置。
+             
+         使用浏览器访问 www.app.com 时，就调度到了本机上的虚拟主机名为 www.test.com 上。         
 
 
 
 
+    （2）Nginx 和 Tomcat 在一台服务器上，并且实现动静分离
 
+        server {
+                listen 80;
+                server_name www.app.com;
+                index index.jsp index.html;
+                location / {
+                        rewrite / /index.jsp last;
+                }
 
+                location ~* \.(html|jpg|png|image)$ {
+                        root /data/web/html;
+                }
+
+                location ~* \.(jsp|d0)$  {
+
+                        proxy_pass http://www.test.com:8080;
+                }
+        }
+        # 当访问 www.app.com 时，url 会被重写为 /index.jsp ，而以 jsp 结尾的文件将由tomcat处理。当访问 静态页面时，会有 nginx 自己处理。
+          当访问动态页面时，会被调度到本机上的 tomcat 处理。
 
 
 
