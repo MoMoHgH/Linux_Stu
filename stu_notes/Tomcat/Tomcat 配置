@@ -255,7 +255,7 @@
 			memcached
 			redis
 
-session cluster ：
+session cluster ：此方案 tomcat 集群最好不要超过 4 个
 	 client -> proxy(nginx) -> session cluster(nginx + tomcat nginx处理静态请求，tomcat处理动态请求)
 	 测试页面 ：index.jsp
 		<%@ page language="java" %>
