@@ -173,26 +173,69 @@
 
     （2）Nginx 和 Tomcat 在一台服务器上，并且实现动静分离
 
-        server {
-                listen 80;
-                server_name www.app.com;
-                index index.jsp index.html;
-                location / {
-                        rewrite / /index.jsp last;
-                }
 
-                location ~* \.(html|jpg|png|image)$ {
-                        root /data/web/html;
-                }
+		server {
+			listen 80;
+			server_name www.app.com;
+			index index.jsp index.html;
+			location / {
+				rewrite / http://www.test.com:8080 last;
+			}
 
-                location ~* \.(jsp|d0)$  {
+			location ~ ^/test1/ {
+				rewrite ^/test1/(.*)$ http://www.test.com:8080/test1/$1 last;
+			}
 
-                        proxy_pass http://www.test.com:8080;
-                }
-        }
+			location ~* \.(html|jpg|png|image)$ {
+				root /data/web/html;
+			}
+
+			location ~* \.(jsp|d0)$  {
+
+				proxy_pass http://www.test.com:8080;
+			}
+		}
+
         # 当访问 www.app.com 时，url 会被重写为 /index.jsp ，而以 jsp 结尾的文件将由tomcat处理。当访问 静态页面时，会有 nginx 自己处理。
           当访问动态页面时，会被调度到本机上的 tomcat 处理。
 
+
+
+8. httpd 实现代理 （可进行 ajp http 协议的调度）
+	（1） http 协议的代理
+
+		<VirtualHost *:80>
+			ServerName      www.app.com
+			ProxyRequests Off				 # 关闭正向代理
+			ProxyVia        On				 # 响应客户端时，是否在首部加入 Via,让客户端知道内容是由谁代理的
+			ProxyPreserveHost Off			         # 是否保留主机头
+			<Proxy *>
+				Require all granted
+			</Proxy>
+			ProxyPass / http://www.test.com:8080/
+			ProxyPassReverse / http://www.test.com:8080/
+			<Location />
+				Require all granted
+			</Location>
+		</VirtualHost>
+
+
+	（2） ajp 协议的代理
+
+		<VirtualHost *:80>
+			ServerName      www.ajp.com
+			ProxyRequests Off
+			ProxyVia        On
+			ProxyPreserveHost Off
+			<Proxy *>
+				Require all granted
+			</Proxy>
+			ProxyPass / ajp://127.0.0.1:8009/
+			ProxyPassReverse / ajp://127.0.0.1:8009/
+			<Location />
+				Require all granted
+			</Location>
+		</VirtualHost>
 
 
 
