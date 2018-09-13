@@ -76,13 +76,13 @@ ngx_http_core_module  核心模块
 
                 # server_name 支持通配符和正则表达式 配合DNS可以做泛域名解析
                      例：
-                        server_name     *.magedu.com www.magedu.*;
-                        server_name        ~^www\d+\.magedu\.com$;       # \d 表示[0-9]
+                        server_name     *.test.com www.test.*;
+                        server_name        ~^www\d+\.test\.com$;       # \d 表示[0-9]
                         匹配优先级机制从高到低:
-                           (1) 首先是字符串精确匹配 如：www.magedu.com
-                           (2) 左侧*通配符 如：*.magedu.com
-                           (3) 右侧*通配符 如：www.magedu.*
-                           (4) 正则表达式 如： ~^.*\.magedu\.com$
+                           (1) 首先是字符串精确匹配 如：www.test.com
+                           (2) 左侧*通配符 如：*.test.com
+                           (3) 右侧*通配符 如：www.test.*
+                           (4) 正则表达式 如： ~^.*\.test\.com$
                            (5) default_server
                                         
                                         
