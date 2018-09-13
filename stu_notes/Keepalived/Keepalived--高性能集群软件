@@ -1,4 +1,5 @@
 Keepalived :
+
     全局配置：
     
       ! Configuration File for keepalived
