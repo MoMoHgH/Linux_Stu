@@ -45,7 +45,7 @@ ngx_http_proxy_module
         systemctl start httpd
         
         
-    Web_Server_2(192.168.31.3) 负责处理动态页面
+    Web_Server_2(192.168.31.4) 负责处理动态页面
         
         yum -y install httpd php-fpm
         echo 'This is Server 2' > /var/www/html/index.html
