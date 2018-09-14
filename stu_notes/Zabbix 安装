@@ -1,0 +1,75 @@
+1. 配置 Yum 仓库配置文件：
+
+        vim /etc/yum.repo.d/zabbix
+        
+                [zabbix]
+                name=zabbix
+                baseurl=https://mirrors.tuna.tsinghua.edu.cn/zabbix/zabbix/3.4/rhel/7/x86_64/
+                gpgcheck=0
+                enabled=1
+
+
+                [zabbix-non-supported]
+                name=zabbix-non-supported
+                baseurl=https://mirrors.tuna.tsinghua.edu.cn/zabbix/non-supported/rhel/7/x86_64/
+                enabled=1
+
+
+2. 安装 Mysql 数据库
+
+        yum install mariadb-server
+        
+    修改 Mysql 配置文件
+        vim /etc/my.cnf.d/server.cnf
+           [mysqld]
+           skip_name_resolve=ON                               # 跳过域名解析
+    
+    启动 Mysql
+        systemctl start mariadb
+
+
+3. 创建数据库
+
+    创建 zabbix 数据库及授权用户
+        
+        mysql> create database zabbix character set utf8 collate utf8_bin;
+        mysql> grant all privileges on zabbix.* to zabbix@'192.168.1.%' identified by 'qwe123';
+    
+    定义 zabbix 数据库表结构
+        zcat /usr/share/doc/zabbix-server-mysql*/create.sql.gz | mysql -uzabbix -pqwe123 -h192.168.1.1 zabbix
+
+
+4. 编辑 zabbix 主配置文件
+
+        vim /etc/zabbix/zabbix_server.conf
+          DBHost=192.168.1.1
+          DBName=zabbix
+          DBUser=zabbix
+          DBPassword=qwe123
+
+
+
+5. 启动 zabbix server
+        vim  /etc/httpd/conf.d/zabbix.conf                              # 更改时区
+            php_value date.timezone Asia/Shanghai       
+        
+        systemctl start httpd zabbix-server
+
+
+6. 在浏览器中访问 zabbix 管理页面
+
+         http://192.168.1.1/zabbix
+         界面 ：
+              第一个界面 Welcome                   : 选择 Next step 继续安装 
+              第二个界面 Check of pre-requisites   : 此界面检查你的配置条件是否正常 ，显示全部 OK ，则可以继续下一步  
+              第三个界面 Configure DB connection   : 此界面输入数据库的 IP ，端口（0 ，表示默认），数据库名，用户，密码
+              第四个界面 Zabbix server details     : 可直接下一步        
+              第五个界面 Pre-installation summary  : 确认你之前的输入信息，检查无误后下一步
+              第六个界面 Install                   : 成功页面
+         登陆 ：
+              zabbix 初始管理用户名位 Admin ，密码位 zabbix
+        
+
+
+
+
