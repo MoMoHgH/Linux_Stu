@@ -1,7 +1,7 @@
 主机IP列表：
         [root@centos6 ~]#cat hostlist.txt 
-        192.168.30.7 root centos
-        192.168.30.17 root magedu
+        192.168.30.7 root centos1
+        192.168.30.17 root centos2
 
 
 [root@centos6 ~]#cat pushkey.sh 
