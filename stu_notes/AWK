@@ -49,3 +49,16 @@
 
 
 awk 'BEGIN{}{}END{}' 
+
+
+6. 有100个文件，他们的地址都是 http://www.test.com/test1.tar.gz 
+			     http://www.test.com/test1.tar.gz
+			     ...
+			     http://www.test.com/test1.tar.gz
+   批量下载这100个文件，并找出大于50M 的文件
+   
+   	for i in {1..100}; do wget http://www.test.com/test$i.tar.gz; done
+	du -h * | awk -F'M' '{if ($1 > 50) print $1"M" , $2}'
+	
+	
+   
