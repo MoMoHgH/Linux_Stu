@@ -87,6 +87,7 @@
 
 
 
+
 8  验证结果
    vim /etc/my.cnf
    skip-networking 删除此行
