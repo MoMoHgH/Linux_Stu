@@ -13,6 +13,7 @@ Mysql安装
       https://mirrors.tuna.tsinghua.edu.cn/mariadb/yum/10.2/centos7-amd64    MariaDB镜像
       
       
+      
 二进制安装（MariaDB）
       /data/mysql       --数据库的数据所在路径
       /usr/local        --数据库程序所在路径
