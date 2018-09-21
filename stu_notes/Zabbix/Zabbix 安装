@@ -13,6 +13,7 @@
                 name=zabbix-non-supported
                 baseurl=https://mirrors.tuna.tsinghua.edu.cn/zabbix/non-supported/rhel/7/x86_64/
                 enabled=1
+   yum install zabbix-server-mysql zabbix-web-mysql zabbix-agent             
 
 
 2. 安装 Mysql 数据库
