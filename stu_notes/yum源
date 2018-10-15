@@ -1,0 +1,12 @@
+[base]
+name=centos7_base
+baseurl=http://mirrors.aliyun.com/centos/$releasever/os/$basearch/
+enabled=1
+gpgcheck=0
+
+
+[epel]
+name=centos7_epel
+baseurl=http://mirrors.aliyun.com/epel/7/$basearch
+enabled=1
+gpgcheck=0
