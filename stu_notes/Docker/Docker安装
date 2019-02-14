@@ -1,1 +1,14 @@
 
+安装前置条件：（CentOS）
+              内核版本不低于 3.8
+              Device Mapper 存储驱动，为Docker提供存储能力
+                     [root@_node_01 ~]# ls /sys/class/misc/device-mapper -ls
+                                        0 lrwxrwxrwx 1 root root 0 Feb 14 17:51 /sys/class/misc/device-mapper -> ../../devices/virtual/misc/device-mapper
+
+              如果没有安装Device Mapper，
+                      yum install device-mapper   安装
+                      modprobe dm_mod             加载模块
+                      
+                      
+
+
