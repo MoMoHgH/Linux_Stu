@@ -60,5 +60,16 @@ awk 'BEGIN{}{}END{}'
    	for i in {1..100}; do wget http://www.test.com/test$i.tar.gz; done
 	du -h * | awk -F'M' '{if ($1 > 50) print $1"M" , $2}'
 	
-	
-   
+		
+  对齐
+   -  左对齐，不写默认右对齐；15s 15个字符 
+ cat table_alarm_log.txt | grep -v Field | awk '{printf "%-15s %15s\n",$1,$2}'
+ id                      int(11)
+channel_id              int(11)
+channel_name          char(128)
+task_id                char(64)
+alarm_time             char(32)
+device_ip              char(32)
+device_port             int(11)
+status                 char(64)
+description        varchar(255)
