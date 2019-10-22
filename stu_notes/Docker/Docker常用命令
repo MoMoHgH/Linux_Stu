@@ -1,0 +1,4 @@
+docker info               --返回镜像和容器的数量，docker的执行驱动和存储驱动，docker的基本配置
+docker run -i -t  ubuntu /bin/bash      -- -i保证容器的SDTIN（标准输入）是开启的；-t为创建的容器分配一个伪tty终端；ubuntu 以什么镜像创建容器；此命令会先检查
+                                            本地是否有ubuntu这个镜像，如果没有会到官方维护的Docker Hub Registry查找是否有这个镜像，一旦找到就会下载到本地。
+     
