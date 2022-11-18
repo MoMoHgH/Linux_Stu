@@ -8,7 +8,31 @@
               如果没有安装Device Mapper，
                       yum install device-mapper   安装
                       modprobe dm_mod             加载模块
-                      
-                      
+卸载旧版：                      
+yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+
+
+卸载docker:
+      yum remove docker-ce docker-ce-cli containerd.io
+      rm -rf /var/lib/docker
+      rm -rf /var/lib/containerd
+
+
+安装：
+  containerd.io ： 守护进程 containerd， 它在 docker 包上独立工作，并且是 docker 包所必需的。
+  docker-ce-cli
+  docker-ce
+                 
+yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+yum makecache fast
+yum install docker-ce docker-ce-cli containerd.io
+
 
 
