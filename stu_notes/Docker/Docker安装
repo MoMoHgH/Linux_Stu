@@ -26,13 +26,18 @@ yum remove docker \
 
 
 安装：
-  containerd.io ： 守护进程 containerd， 它在 docker 包上独立工作，并且是 docker 包所必需的。
-  docker-ce-cli
-  docker-ce
-                 
-yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-yum makecache fast
-yum install docker-ce docker-ce-cli containerd.io
+   containerd.io ： 守护进程 containerd， 它在 docker 包上独立工作，并且是 docker 包所必需的。
+   docker-ce-cli
+   docker-ce
+  设置阿里云stable镜像仓库  
+  yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+  yum makecache fast
+  
+  开始安装：
+  yum install docker-ce docker-ce-cli containerd.io  docker-compose-plugin
+  
+  
 
 
 
