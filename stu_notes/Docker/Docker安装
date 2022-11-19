@@ -29,11 +29,28 @@ yum remove docker \
    containerd.io ： 守护进程 containerd， 它在 docker 包上独立工作，并且是 docker 包所必需的。
    docker-ce-cli
    docker-ce
+   
   设置阿里云stable镜像仓库  
   yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 
   yum makecache fast
   
+  镜像加速
+  腾讯云
+  vim /etc/docker/daemon.json
+    {
+    "registry-mirrors": ["https://mirror.ccs.tencentyun.com"]
+    }
+  sudo systemctl restart docker
+  
+  阿里云
+  vim /etc/docker/daemon.json
+    {
+    "registry-mirrors": ["https://pneujag7.mirror.aliyuncs.com"]
+    }
+    sudo systemctl restart docker
+
+
   开始安装：
   yum install docker-ce docker-ce-cli containerd.io  docker-compose-plugin
   
