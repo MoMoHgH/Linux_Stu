@@ -1,0 +1,7 @@
+1、 docker内重启，sshd报错：“Failed to get D-Bus connection: Operation not permitted”
+
+    容器并不是一个完整的操作系统，只有一个文件系统，而且默认启动只是普通用户这样的权限访问Linux内核，也就是没有特权，需要以特权模式运行容器。
+    
+    # docker run -p 2023:22 -d -v /nas/nas_01:/nas_01 --privileged elain/centos7.2 /usr/sbin/init
+    
+
