@@ -75,7 +75,16 @@ ansible命令执行过程
     绿色：执行成功并且不需要做改变的操作
     黄色：执行成功并且对目标主机做变更
     红色：执行失败
+    
 
+常用免密方法：
+   01  vim /etc/ansible
+        [group1]
+        192.168.10.101 ansible_ssh_user="root" ansible_ssh_pass="centos"
+        [group2]
+        192.168.10.102 ansible_ssh_user="root" ansible_ssh_pass="centos"
+   02 公钥认证：
+      
 
 
 ansible常用模块
