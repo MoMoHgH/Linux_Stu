@@ -194,4 +194,30 @@ Group：管理组
     │   └── nginx.conf.j3
     └── vars
         └── main.yml
+  
+  
+/etc/ansible/mgmtd.yml
+---
+- hosts: mgmtd_node
+  remote_user: root
+  vars:
+    - filename: /root/pack/bravoencoder_centos_7.2.1511_master_0ede5d1_intel_qsv_hevc
+  tasks:
+
+    - name: copy mgmtd install package
+      copy: src={{ filename }}.tar.gz  dest=/root/pack/ backup=yes
+    - name: unzip  mamtd package
+      shell: tar -xzf {{ filename }}.tar.gz -C /root/pack
+      tags: unzipmgmtd
+    - name: install mgmtd package
+      shell: cd {{ filename }} && ./install.sh
+      tags: installmgmtd
+    - name: copy mgmtd conf file
+      copy: src=/root/pack/mgmtd.conf dest=/opt/bravo/mgmt/mgmtd.conf
+      notify: restart_mgmtd
+      tags: restartmgmtd
+
+  handlers:
+    - name: restart_mgmtd
+      service: name=mgmtd state=restarted
 
