@@ -153,11 +153,6 @@ kubeadm init \
 --cri-socket /var/run/cri-dockerd.sock \
 --ignore-preflight-errors=all
 
-
-# 如果出问题，想重置集群：
-# kubeadm  reset -f
-
-
 # 根据提示执命令
 
 在集群上执行
@@ -169,6 +164,26 @@ kubeadm init \
 # kubeadm join 192.168.1.41:6443 --token 9rmt8j.2pqoh7drm68ns249 \
                                  --discovery-token-ca-cert-hash sha256:ff558174c47aba532fef2920f80e1f48976d4712a970eba1a7fac0428c8373ab \
                                  --cri-socket /var/run/cri-dockerd.sock
+
+
+
+
+# 如果出问题，想重置集群：
+# kubeadm  reset -f
+# systemctl stop kubelet
+# systemctl stop docker
+# rm -rf /var/lib/cni/
+# rm -rf /var/lib/kubelet/*
+# rm -rf /etc/cni/
+# ifconfig cni0 down
+# ifconfig flannel.1 down
+# ifconfig docker0 down
+# ip link delete cni0
+# ip link delete flannel.1
+#重启kubelet
+systemctl restart kubelet
+#重启docker
+systemctl restart docker
 
 
 
