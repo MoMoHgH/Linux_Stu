@@ -1,0 +1,210 @@
+            +-----------------+------------------+-----------------------------+-----------------------+
+            |    Hostname     |  System Version  |             IP              |        备注           |
+            +-----------------+------------------+-----------------------------+-----------------------+
+            |   master-130    |    Centos7.9     |   eth0 : 192.168.10.130/24  |                       |    
+            +-----------------+------------------+-----------------------------+-----------------------+
+            |   node-131      |    Centos7.9     |   eth0 : 192.168.10.131/24  |                       |    
+            +-----------------+------------------+-----------------------------+-----------------------+
+            |   node-132      |    Centos7.9     |   eth0 : 192.168.10.132/24  |                       |    
+            +-----------------+------------------+-----------------------------+-----------------------+
+            |   node-133      |    Centos7.9     |   eth0 : 192.168.10.133/24  |                       |    
+            +-----------------+------------------+-----------------------------+-----------------------+
+
+安装前环境准备：关闭firewalld、selinux,禁用swap分区
+
+1、修改内核参数,配置IP转发：
+cat > /etc/sysctl.d/k8s.conf << EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+
+# sysctl -p                   # 重新加载配置
+# modprobe br_netfilter       # 加载网桥过滤模块
+# lsmod | grep br_netfilter   # 查看网桥过滤模块是否加载成功
+
+
+
+
+2、配置IPVS：在Kubernetes中Service有两种带来模型，一种是基于iptables的，一种是基于ipvs的两者比较的话，ipvs的性能明显要高一些，但是如果要使用它，需要手动载入ipvs模块
+
+# yum install ipset ipvsadm -y           # 安装ipset和ipvsadm
+# 添加需要加载的模块写入脚本文件
+# cat <<EOF> /etc/sysconfig/modules/ipvs.modules           
+#!/bin/bash
+modprobe -- ip_vs
+modprobe -- ip_vs_rr
+modprobe -- ip_vs_wrr
+modprobe -- ip_vs_sh
+modprobe -- nf_conntrack_ipv4
+EOF
+
+# chmod +x /etc/sysconfig/modules/ipvs.modules               #为脚本添加执行权限
+# /bin/bash /etc/sysconfig/modules/ipvs.modules              #执行脚本文件
+# lsmod | grep -e ip_vs -e nf_conntrack_ipv4                 #查看对应的模块是否加载成功
+
+
+
+
+3、安装docker：在默认情况下使用Vgroup Driver为cgroupfs，而Kubernetes推荐使用systemd来替代cgroupfs
+docker配置文件
+# mkdir /etc/docker
+# cat <<EOF> /etc/docker/daemon.json
+{
+"exec-opts": ["native.cgroupdriver=systemd"],
+"registry-mirrors": ["https://pneujag7.mirror.aliyuncs.com"]
+}
+EOF
+
+# wget https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo -O /etc/yum.repos.d/docker-ce.repo      #配置repo仓库
+# yum install -y docker-ce                                                                                      #安装
+# systemctl start docker && systemctl enable docker
+
+
+4、部署 cri-dockerd：从kubernetes 1.24开始，dockershim已经从kubelet中移除，但因为历史问题docker不支持kubernetes主推的CRI（容器运行时接口）标准，所以docker不能再作为kubernetes的容器运行时了，即从kubernetesv1.24开始不再使用docker了。
+
+但是如果想继续使用docker的话，可以在kubelet和docker之间加上一个中间层cri-docker。cri-docker是一个支持CRI标准的shim（垫片）。一头通过CRI跟kubelet交互，另一头跟docker api交互，从而间接的实现了kubernetes以docker作为容器运行时。
+
+下载地址：https://github.com/Mirantis/cri-dockerd/releases （cri-dockerd-v0.3.3-linux-amd64.tar.gz）
+
+# tar xf cri-dockerd-0.3.1.amd64.tgz 
+# cp cri-dockerd/cri-dockerd /usr/bin/
+# chmod +x /usr/bin/cri-dockerd 
+
+#配置启动文件
+# cat <<"EOF" > /usr/lib/systemd/system/cri-docker.service
+[Unit]
+Description=CRI Interface for Docker Application Container Engine
+Documentation=https://docs.mirantis.com
+After=network-online.target firewalld.service docker.service
+Wants=network-online.target
+Requires=cri-docker.socket
+[Service]
+Type=notify
+ExecStart=/usr/bin/cri-dockerd --network-plugin=cni --pod-infra-container-image=registry.aliyuncs.com/google_containers/pause:3.7
+ExecReload=/bin/kill -s HUP $MAINPID
+TimeoutSec=0
+RestartSec=2
+Restart=always
+StartLimitBurst=3
+StartLimitInterval=60s
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+TasksMax=infinity
+Delegate=yes
+KillMode=process
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 配置socket文件
+# cat <<"EOF" > /usr/lib/systemd/system/cri-docker.socket
+[Unit]
+Description=CRI Docker Socket for the API
+PartOf=cri-docker.service
+[Socket]
+ListenStream=%t/cri-dockerd.sock
+SocketMode=0660
+SocketUser=root
+SocketGroup=docker
+[Install]
+WantedBy=sockets.target
+EOF
+
+# systemctl daemon-reload
+# systemctl enable cri-docker --now
+#systemctl is-active cri-docker                              #检查状态
+
+
+
+5、部署K8S：
+
+# 配置yum源 
+# cat > /etc/yum.repos.d/kubernetes.repo << EOF
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+enabled=1
+gpgcheck=0
+repo_gpgcheck=0
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF
+
+# 安装kubeadm kubelet kubectl
+# yum install -y kubelet-1.25.0 kubeadm-1.25.0 kubectl-1.25.0
+
+# systemctl enable kubelet
+# kubeadm version
+
+            
+     
+     
+     
+6、初始化K8S集群（仅master操作）
+
+kubeadm init \
+--apiserver-advertise-address=192.168.10.130 \
+--image-repository registry.aliyuncs.com/google_containers \
+--kubernetes-version v1.25.0 \
+--service-cidr=10.10.0.0/12 \
+--pod-network-cidr=172.16.0.0/16 \
+--cri-socket /var/run/cri-dockerd.sock \
+--ignore-preflight-errors=all
+
+
+# 如果出问题，想重置集群：
+# kubeadm  reset -f
+
+
+# 根据提示执命令
+
+在集群上执行
+# mkdir -p $HOME/.kube
+# sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+# sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+在节点上执行
+# kubeadm join 192.168.1.41:6443 --token 9rmt8j.2pqoh7drm68ns249 \
+                                 --discovery-token-ca-cert-hash sha256:ff558174c47aba532fef2920f80e1f48976d4712a970eba1a7fac0428c8373ab \
+                                 --cri-socket /var/run/cri-dockerd.sock
+
+
+
+
+6、配置集群网络插件： k8s支持多种插件：flannel、callco、canal等等，任选一种使用即可，本次选用callco  （calico-v3.24.3.zip）
+
+# 上传文件（四个）   calico.yaml calico~cni~v3.24.3.tar.gz calico~kube~controllers~v3.24.3.tar.gz  calico~node~v3.24.3.tar.gz
+
+# 每个节点手动通过docker离线加载镜像
+# docker load -i calico~cni~v3.24.3.tar.gz && docker load -i calico~kube~controllers~v3.24.3.tar.gz && docker load -i calico~node~v3.24.3.tar.gz 
+
+
+
+集群安装
+# kubectl apply -f calico.yaml 
+
+
+
+
+7、查看集群状态
+# kubectl get nodes
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+      
