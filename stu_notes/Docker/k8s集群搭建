@@ -199,10 +199,19 @@ systemctl restart docker
 # kubectl apply -f calico.yaml 
 
 
+7、修改Kube-proxy 模式
+# curl 127.0.0.1:10249/proxyMode           #查看Kube-proxy代理模式（iptables、ipvs）
+# kubectl edit cm kube-proxy -n kube-system      #如果为iptables模式，需修改为ipvs，找到 mode 配置行，修改为 mode: ipvs、
+# kubectl patch daemonset kube-proxy -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"date\":\"`date +'%s'`\"}}}}}" -n kube-system                         #更新配置
+# curl 127.0.0.1:10249/proxyMode           #确认是否修改成功
 
 
-7、查看集群状态
+
+
+8、查看集群状态
 # kubectl get nodes
+
+
 
             
             
