@@ -160,10 +160,8 @@ kubeadm init \
 # sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 # sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-在节点上执行
-# kubeadm join 192.168.1.41:6443 --token 9rmt8j.2pqoh7drm68ns249 \
-                                 --discovery-token-ca-cert-hash sha256:ff558174c47aba532fef2920f80e1f48976d4712a970eba1a7fac0428c8373ab \
-                                 --cri-socket /var/run/cri-dockerd.sock
+在节点上执行 (不要直接复制粘贴提示信息，删去换行符)
+# kubeadm join 192.168.10.130:6443 --token kidofz.5znac4whqvq4vefa --discovery-token-ca-cert-hash sha256:a9d1399de77e3e7ab49840a064627837745a8ff2cd634884dab0e74df4c7d3cb --cri-socket /var/run/cri-dockerd.sock
 
 
 
