@@ -1,0 +1,34 @@
+192.168.1.100  （nfs_master /data）
+192.168.1.101  （nfs_slave /data）
+
+
+1、免密（需要在主、备nfs上都执行）
+ssh-keygen   						 #一路回车即可,生成rsa密钥对
+ssh-copy-id root@192.168.1.101       #将自己的公钥发给对端IP，回车后输入对端登录密码，即可免密登录对端服务器
+
+
+
+2、安装inotify
+yum install  inotify-tools -y
+
+
+
+3、配置inotify脚本（主、备nfs服务器都需要执行，注意脚本中的IP写对端服务器IP）
+
+vim inotify.sh
+#!/bin/bash
+inotifywait=/usr/bin/inotifywait
+
+$inotifywait -mrq --timefmt '%Y%m%d %H:%M' --format '%T %w%f%e' -e modify,delete,create,attrib /data \
+| while read files ;do
+rsync -az --timeout=60 --bwlimit=60000 /data/ root@192.168.10.142:/data
+done
+
+
+chmod +x inotify.sh							#增加执行权限
+
+nohup  /root/inotify.sh &					#后台启动
+
+echo "nohup /root/inotify.sh" >> /etc/rc.d/rc.local       #设置开机启动
+
+chmod +x /etc/rc.d/rc.local 							  #开机启动脚本增加执行权限，默认没有
