@@ -1,0 +1,33 @@
+
+1、开启防火墙
+systemctl start firewalld  && systemctl enable firewalld                #如开启状态可不执行
+
+
+2、配置nfs端口访问
+vim /etc/firewalld/services/nfs.xml                                #添加如下信息
+
+
+<service>
+  <short>nfs</short>
+  <description>nfs</description>
+  <port protocol="tcp" port="111"/>
+  <port protocol="udp" port="111"/>
+  <port protocol="tcp" port="662"/>
+  <port protocol="udp" port="662"/>
+  <port protocol="tcp" port="892"/>
+  <port protocol="udp" port="892"/>
+  <port protocol="tcp" port="2049"/>
+  <port protocol="udp" port="2049"/>
+  <port protocol="udp" port="32769"/>
+  <port protocol="tcp" port="32803"/>
+</service>
+
+3、使生效
+firewall-cmd --add-service=nfs --zone=public --permanent
+firewall-cmd --reload
+
+
+4、关闭selinux
+setenforce 0          #临时关闭，设备重启则失效
+
+vim /etc/selinux/config     #修改配置文件，永久生效；将 SELINUX=enforcing 改为 SELINUX=disabled
