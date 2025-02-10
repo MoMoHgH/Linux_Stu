@@ -30,7 +30,8 @@
 		Executable     : /tools/redis/bin/redis-server
 		Cli Executable : /tools/redis/bin/redis-cli
 
-
+4、redis服务管理
+    systemctl start | status | restart | stop redis_6379
 
 对于启动日志第一行的告警，可以根据提示做出临时或永久性调整
   WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
