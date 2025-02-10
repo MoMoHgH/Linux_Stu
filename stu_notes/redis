@@ -1,0 +1,38 @@
+1、下载redis
+	wget https://download.redis.io/redis-stable.tar.gz
+	
+2、解压并编译安装
+	tar -xzvf redis-stable.tar.gz
+	cd redis-stable
+	make
+	make PREFIX=/tools/redis install   #自定义安装目录，便于管理
+
+3、配置systemd管理redis服务，通过install_server.sh脚本文件在/etc/init.d目录下生成redis的service文件
+
+	编辑 redis-stable/utils/install_server.sh 文件
+		将76-84行注释掉
+		#_pid_1_exe="$(readlink -f /proc/1/exe)"
+		#if [ "${_pid_1_exe##*/}" = systemd ]
+		#then
+		#		echo "This systems seems to use systemd."
+		#		echo "Please take a look at the provided example service unit files in this directory, and adapt and install them. Sorry!"
+		#		exit 1
+		#fi
+		#unset _pid_1_exe
+		
+	执行install_server.sh 文件
+		./utils/install_server.sh
+		
+	执行过程中可以用默认或者自定义端口号、配置文件、日志文件、数据目录、redis-server二进制文件目录、客户端目录
+		Config file    : /tools/redis/conf/6379.conf
+		Log file       : /tools/redis/log/redis_6379.log
+		Data dir       : /data/redis/6379
+		Executable     : /tools/redis/bin/redis-server
+		Cli Executable : /tools/redis/bin/redis-cli
+
+
+
+对于启动日志第一行的告警，可以根据提示做出临时或永久性调整
+  WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+	这是因为系统的内存过度分配 (Memory overcommit) 功能没有启用，而在某些情况下，例如当系统内存不足时，这可能导致后台保存或复制操作失败。
+	内存过度分配是 Linux 系统中的一个机制，允许系统分配的总内存超过实际物理内存的总量。默认情况下，Linux 内核根据可用的物理内存来决定是否允许分配内存块。然而，在某些情况下，比如 Redis 的后台保存或复制操作，系统可能需要分配超过可用物理内存的内存，这时如果内存过度分配未启用，操作可能会失败。
