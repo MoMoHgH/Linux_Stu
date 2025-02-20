@@ -53,6 +53,22 @@ yum remove docker \
     sudo systemctl restart docker
 
 
+以上目前仅限使用公有云的产品才有效
+
+目前可使用以下一个或多个地址
+echo '{
+"registry-mirrors": [
+  "https://proxy.1panel.live",
+  "https://docker.1panel.top",
+  "https://docker.m.daocloud.io",
+  "https://docker.1ms.run",
+  "https://docker.ketches.cn"
+]
+}' | sudo tee /etc/docker/daemon.json
+
+sudo systemctl daemon-reload && sudo systemctl restart docker
+
+
   开始安装：
   yum install docker-ce docker-ce-cli containerd.io  docker-compose-plugin
   
