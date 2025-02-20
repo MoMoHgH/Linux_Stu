@@ -32,6 +32,8 @@ yum remove docker \
    
   设置阿里云stable镜像仓库  
   yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+  配置阿里云yum仓库
+  wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
 
   yum makecache fast
   
